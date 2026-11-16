@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Automation Portfolio</title>
+<meta name="description" content="Python & AI automation portfolio by Ahmad Anis: inventory, review intelligence, websites and apps.">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f4f2; --surface: #fcfcfb; --border: #e2e1dc;
+  --text: #0b0b0b; --text-2: #52514e; --muted: #7a7974;
+  --accent: #2a78d6; --accent-soft: #cde2fb;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111110; --surface: #1a1a19; --border: #33332f;
+    --text: #f0efec; --text-2: #c3c2b7; --muted: #8f8e86;
+    --accent: #3987e5; --accent-soft: #1c3a63;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111110; --surface: #1a1a19; --border: #33332f;
+  --text: #f0efec; --text-2: #c3c2b7; --muted: #8f8e86;
+  --accent: #3987e5; --accent-soft: #1c3a63;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 960px; margin: 0 auto; padding: 48px 16px 64px; }
+h1 { font-size: 32px; letter-spacing: -.02em; margin: 0 0 8px; }
+.lead { font-size: 17px; color: var(--text-2); max-width: 680px; margin: 0 0 20px; }
+.links { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 40px; }
+.links a { font-weight: 600; text-decoration: none; color: var(--text); border: 1px solid var(--border); background: var(--surface); padding: 8px 14px; border-radius: 8px; }
+.links a.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.links a:hover { border-color: var(--accent); }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; margin-bottom: 40px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.card.feature { grid-column: 1 / -1; border-color: var(--accent); }
+.tag { align-self: flex-start; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 99px; }
+.card h3 { margin: 0; font-size: 18px; }
+.card p { margin: 0; color: var(--text-2); }
+.stack { font-size: 13px; color: var(--muted); }
+.card .act { margin-top: auto; padding-top: 8px; display: flex; gap: 14px; flex-wrap: wrap; }
+.card .act a { color: var(--accent); font-weight: 600; text-decoration: none; }
+.card .act a:hover { text-decoration: underline; }
+ul.services { margin: 0; padding-left: 18px; color: var(--text-2); }
+ul.services li { margin-bottom: 6px; }
+footer { color: var(--muted); font-size: 13px; border-top: 1px solid var(--border); padding-top: 16px; }
+footer a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Ahmad Anis</h1>
+  <p class="lead">Python &amp; AI automation for operations. 10+ years writing Python and 10 years in supply chain, so I build tools that fit how a business actually runs: inventory, purchasing, reporting, reviews and lead generation.</p>
+  <div class="links">
+    <a class="primary" href="inventory-reorder-dashboard/">Live demo: reorder dashboard</a>
+    <a href="https://ahmaddataguru.com">ahmaddataguru.com</a>
+    <a href="https://github.com/ahmadanis3620-hue">GitHub</a>
+  </div>
+
+  <h2>Selected work</h2>
+  <div class="grid">
+    <article class="card feature">
+      <span class="tag">Supply chain automation</span>
+      <h3>Inventory Reorder Dashboard</h3>
+      <p>Turns sales history into safety stock, reorder points and supplier-ready purchase orders. Flags items that will run out before a PO can arrive and shows cash tied up in overstock. Adjust the service level and every number recalculates.</p>
+      <div class="stack">Python (standard library) · HTML/JS dashboard · 7 unit tests</div>
+      <div class="act"><a href="inventory-reorder-dashboard/">Open live demo →</a><a href="https://github.com/ahmadanis3620-hue/automation-portfolio/tree/main/inventory-reorder-dashboard">Source</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">AI · review intelligence</span>
+      <h3>ReputeIQ</h3>
+      <p>Analyzes customer reviews for local service businesses: finds recurring complaints and strengths, benchmarks competitors, spots trends, and ranks what to fix next, with a monthly report.</p>
+      <div class="stack">Next.js · TypeScript · Prisma · LLM analysis · 143 tests</div>
+      <div class="act"><a href="https://github.com/ahmadanis3620-hue/Reviewlens">Source</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">Web app</span>
+      <h3>Chore App</h3>
+      <p>A household chore tracking app with sign-in and a hosted database.</p>
+      <div class="stack">Next.js · TypeScript · Supabase · Vercel</div>
+      <div class="act"><a href="https://project-erbsf.vercel.app">Live app →</a><a href="https://github.com/ahmadanis3620-hue/Chore-App">Source</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">Small business website</span>
+      <h3>Hilliard Dry Cleaners</h3>
+      <p>One-page website for a local dry cleaner, built from public listings, with real customer reviews and hours. Fast, no build step, free hosting.</p>
+      <div class="stack">HTML · CSS · GitHub Pages</div>
+      <div class="act"><a href="https://ahmadanis3620-hue.github.io/hilliard-dry-cleaners/">Live site →</a><a href="https://github.com/ahmadanis3620-hue/hilliard-dry-cleaners">Source</a></div>
+    </article>
+    <article class="card">
+      <span class="tag">Small business website</span>
+      <h3>Super Cleaning B.H.</h3>
+      <p>One-page website for a house cleaning service, built from a business card photo: services, call and text buttons, mobile first.</p>
+      <div class="stack">HTML · CSS · GitHub Pages</div>
+      <div class="act"><a href="https://ahmadanis3620-hue.github.io/cleaning/">Live site →</a><a href="https://github.com/ahmadanis3620-hue/cleaning">Source</a></div>
+    </article>
+  </div>
+
+  <h2>What I build</h2>
+  <div class="card" style="margin-bottom:40px">
+    <ul class="services">
+      <li><b>Inventory &amp; reorder automation</b>: stock alerts, POs and demand reports from Shopify, Amazon or spreadsheets</li>
+      <li><b>AI chatbots &amp; agents</b>: connected to your documents and data</li>
+      <li><b>Workflow automation</b>: n8n, Zapier and Python scripts that replace repetitive work</li>
+      <li><b>Review &amp; reputation analysis</b>: what customers keep praising and complaining about</li>
+      <li><b>Lead generation pipelines</b> and <b>websites</b> for small businesses</li>
+    </ul>
+  </div>
+
+  <footer>Available for freelance projects and monthly retainers · <a href="https://ahmaddataguru.com">ahmaddataguru.com</a></footer>
+</div>
+</body>
+</html>

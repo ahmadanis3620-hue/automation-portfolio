@@ -1,0 +1,37 @@
+sku,name,category,supplier,unit_cost,case_pack,lead_time_days,lead_time_std,on_hand,on_order,order_cost,holding_rate
+TH-1001,Insulated Water Bottle 32oz,Hydration,Summit Imports,6.40,24,35,7.0,118,0,45,0.25
+TH-1002,Insulated Water Bottle 20oz,Hydration,Summit Imports,5.10,24,35,7.0,710,0,45,0.25
+TH-1003,Collapsible Silicone Cup,Hydration,Summit Imports,2.20,48,35,7.0,312,0,45,0.25
+TH-1004,Water Filter Straw,Hydration,Harbor Goods Co.,4.75,36,14,3.0,0,0,25,0.25
+TH-1005,Camp Mug Enamel,Kitchen,Lakeview Mfg,3.90,24,10,2.0,247,0,25,0.25
+TH-1006,Pour-Over Coffee Kit,Kitchen,Lakeview Mfg,11.50,12,10,2.0,105,0,25,0.25
+TH-1007,Cast Iron Skillet 10in,Kitchen,Lakeview Mfg,14.20,6,10,2.0,194,0,25,0.25
+TH-1008,Cutlery Set Titanium,Kitchen,Summit Imports,8.30,20,35,7.0,163,0,45,0.25
+TH-1009,Compact Stove Burner,Kitchen,Summit Imports,19.80,10,35,7.0,146,0,45,0.25
+TH-1010,Fuel Canister 230g,Kitchen,Pinecrest Supply,3.10,24,7,1.5,348,0,25,0.25
+TH-1011,LED Headlamp 400lm,Lighting,Summit Imports,9.60,20,35,7.0,104,0,45,0.25
+TH-1012,Rechargeable Lantern,Lighting,Summit Imports,15.40,12,35,7.0,337,0,45,0.25
+TH-1013,String Lights Solar 20ft,Lighting,Harbor Goods Co.,7.80,24,14,3.0,35,264,25,0.25
+TH-1014,AA Lithium Batteries 8pk,Lighting,Pinecrest Supply,6.90,24,7,1.5,614,0,25,0.25
+TH-1015,Ultralight Tent 2P,Shelter,Summit Imports,88.00,4,35,7.0,100,0,45,0.25
+TH-1016,Tent Footprint 2P,Shelter,Summit Imports,14.00,10,35,7.0,101,0,45,0.25
+TH-1017,Hammock Double,Shelter,Harbor Goods Co.,17.50,10,14,3.0,168,0,25,0.25
+TH-1018,Tarp 10x10 Ripstop,Shelter,Harbor Goods Co.,12.30,12,14,3.0,96,0,25,0.25
+TH-1019,Sleeping Bag 30F,Sleep,Summit Imports,42.00,4,35,7.0,219,0,45,0.25
+TH-1020,Inflatable Sleeping Pad,Sleep,Summit Imports,24.50,8,35,7.0,212,0,45,0.25
+TH-1021,Camp Pillow,Sleep,Harbor Goods Co.,6.20,24,14,3.0,224,0,25,0.25
+TH-1022,Fleece Blanket Throw,Sleep,Lakeview Mfg,9.40,12,10,2.0,139,0,25,0.25
+TH-1023,Daypack 22L,Packs,Summit Imports,21.00,8,35,7.0,883,0,45,0.25
+TH-1024,Hydration Pack 2L,Packs,Summit Imports,18.60,8,35,7.0,271,0,45,0.25
+TH-1025,Dry Bag 10L,Packs,Harbor Goods Co.,5.30,30,14,3.0,448,0,25,0.25
+TH-1026,Packing Cubes Set,Packs,Harbor Goods Co.,8.10,20,14,3.0,25,0,25,0.25
+TH-1027,First Aid Kit Trail,Safety,Pinecrest Supply,11.20,12,7,1.5,265,0,25,0.25
+TH-1028,Emergency Bivy,Safety,Pinecrest Supply,4.40,40,7,1.5,258,0,25,0.25
+TH-1029,Bear Spray 7.9oz,Safety,Pinecrest Supply,22.00,12,7,1.5,638,0,25,0.25
+TH-1030,Whistle & Compass Combo,Safety,Pinecrest Supply,2.10,50,7,1.5,127,0,25,0.25
+TH-1031,Trekking Poles Pair,Trail,Summit Imports,16.80,10,35,7.0,293,0,45,0.25
+TH-1032,Microspikes Traction,Trail,Summit Imports,13.50,12,35,7.0,0,42,45,0.25
+TH-1033,Merino Hiking Socks,Trail,Lakeview Mfg,5.60,36,10,2.0,226,0,25,0.25
+TH-1034,Gaiters Waterproof,Trail,Lakeview Mfg,9.90,12,10,2.0,48,0,25,0.25
+TH-1035,Sunscreen Stick SPF50,Trail,Pinecrest Supply,2.80,48,7,1.5,2224,0,25,0.25
+TH-1036,Bug Repellent Spray,Trail,Pinecrest Supply,3.30,48,7,1.5,312,0,25,0.25

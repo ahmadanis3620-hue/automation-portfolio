@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory Reorder Dashboard</title>
+<meta name="description" content="Demo: automated reorder points, safety stock, EOQ and purchase orders from sales history.">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f4f4f2;
+  --surface: #fcfcfb;
+  --surface-2: #f0efec;
+  --border: #e2e1dc;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --muted: #7a7974;
+  --grid: #e8e7e2;
+  --accent: #2a78d6;
+  --accent-soft: #cde2fb;
+  --ref: #eb6834;
+  --good: #0ca30c;
+  --warning: #fab219;
+  --serious: #ec835a;
+  --critical: #d03b3b;
+  --info: #6250d6;
+  --shadow: 0 1px 2px rgba(0,0,0,.04), 0 4px 16px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111110; --surface: #1a1a19; --surface-2: #232321; --border: #33332f;
+    --text: #f0efec; --text-2: #c3c2b7; --muted: #8f8e86; --grid: #2c2c29;
+    --accent: #3987e5; --accent-soft: #1c3a63; --ref: #d95926; --info: #9085e9;
+    --shadow: none;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111110; --surface: #1a1a19; --surface-2: #232321; --border: #33332f;
+  --text: #f0efec; --text-2: #c3c2b7; --muted: #8f8e86; --grid: #2c2c29;
+  --accent: #3987e5; --accent-soft: #1c3a63; --ref: #d95926; --info: #9085e9;
+  --shadow: none;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap { max-width: 1240px; margin: 0 auto; padding: 24px 16px 64px; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 20px; }
+h1 { font-size: 22px; margin: 0 0 4px; letter-spacing: -.01em; }
+.sub { color: var(--text-2); margin: 0; max-width: 680px; }
+.badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--accent); background: var(--accent-soft); padding: 3px 8px; border-radius: 99px; margin-bottom: 8px; }
+.btn { font: inherit; font-weight: 600; border: 1px solid var(--border); background: var(--surface); color: var(--text); padding: 8px 14px; border-radius: 8px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn:focus-visible, select:focus-visible, input:focus-visible, th:focus-visible, tr:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.controls { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; box-shadow: var(--shadow); }
+.ctl { display: flex; flex-direction: column; gap: 4px; }
+.ctl label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+select, input[type=search] { font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; min-width: 0; }
+input[type=search] { width: 200px; }
+.ctl.grow { flex: 1 1 200px; }
+.ctl.grow input { width: 100%; }
+
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+.kpi .label { font-size: 12px; color: var(--text-2); display: flex; align-items: center; gap: 6px; }
+.kpi .value { font-size: 28px; font-weight: 700; letter-spacing: -.02em; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.kpi .note { font-size: 12px; color: var(--muted); }
+
+.grid2 { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-bottom: 16px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; box-shadow: var(--shadow); min-width: 0; }
+.card h2 { font-size: 14px; margin: 0 0 2px; }
+.card .hint { font-size: 12px; color: var(--muted); margin: 0 0 12px; }
+
+.dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: none; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--text); }
+.chip svg { flex: none; }
+
+.statusbar { display: flex; flex-direction: column; gap: 8px; }
+.srow { display: grid; grid-template-columns: 120px 1fr 32px; gap: 10px; align-items: center; font-size: 13px; cursor: pointer; border-radius: 6px; padding: 2px 4px; }
+.srow:hover { background: var(--surface-2); }
+.srow.active { background: var(--surface-2); outline: 1px solid var(--border); }
+.srow .track { height: 10px; background: var(--surface-2); border-radius: 4px; overflow: hidden; }
+.srow .fill { height: 100%; border-radius: 0 4px 4px 0; }
+.srow .n { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
+
+.supbars { display: flex; flex-direction: column; gap: 10px; }
+.sbar { display: grid; grid-template-columns: 140px 1fr 90px; gap: 10px; align-items: center; font-size: 13px; position: relative; }
+.sbar .track { height: 18px; }
+.sbar .fill { height: 100%; background: var(--accent); border-radius: 0 4px 4px 0; min-width: 2px; }
+.sbar .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--text-2); }
+
+.tablecard { padding: 0; overflow: hidden; }
+.tablecard .head { padding: 16px 16px 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+th, td { padding: 9px 12px; text-align: right; white-space: nowrap; border-top: 1px solid var(--border); }
+th { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; cursor: pointer; user-select: none; background: var(--surface); position: sticky; top: 0; }
+th:hover { color: var(--text); }
+th.sorted { color: var(--text); }
+th.left, td.left { text-align: left; }
+tbody tr { cursor: pointer; }
+tbody tr:hover, tbody tr.sel { background: var(--surface-2); }
+td .name { font-weight: 600; }
+td .meta { font-size: 12px; color: var(--muted); }
+.order { font-weight: 700; }
+.warnflag { color: var(--critical); font-size: 12px; font-weight: 600; }
+
+.detail { display: none; margin-bottom: 16px; }
+.detail.open { display: block; }
+.detail .top { display: flex; justify-content: space-between; align-items: start; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.detail .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px 16px; margin-bottom: 14px; }
+.fact .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.fact .v { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.charts { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.chart { position: relative; }
+.chart h3 { font-size: 13px; margin: 0 0 2px; }
+.legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12px; color: var(--text-2); margin: 4px 0 6px; }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.sw-line { width: 16px; height: 2px; background: currentColor; display: inline-block; }
+.sw-dash { width: 16px; height: 0; border-top: 2px dashed currentColor; display: inline-block; }
+svg text { fill: var(--muted); font-size: 11px; font-family: inherit; }
+.tip { position: absolute; pointer-events: none; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.12); white-space: nowrap; display: none; z-index: 5; }
+.tip b { font-variant-numeric: tabular-nums; }
+
+.method { font-size: 13px; color: var(--text-2); }
+.method code { background: var(--surface-2); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+.method h2 { color: var(--text); }
+footer { margin-top: 24px; font-size: 12px; color: var(--muted); text-align: center; }
+footer a { color: var(--accent); }
+
+@media (max-width: 900px) {
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .grid2, .charts { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .kpi .value { font-size: 22px; }
+  .sbar { grid-template-columns: 100px 1fr 70px; }
+  input[type=search] { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <span class="badge">Portfolio demo · sample data</span>
+      <h1>Inventory Reorder Dashboard</h1>
+      <p class="sub">Turns 180 days of sales history into reorder points, safety stock and ready-to-send purchase orders, for a fictional outdoor-gear store with 36 SKUs and 4 suppliers. Change the service level and everything recalculates.</p>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" id="themeBtn" type="button" aria-label="Toggle dark mode">◐ Theme</button>
+      <button class="btn primary" id="exportBtn" type="button">⬇ Export POs (CSV)</button>
+    </div>
+  </header>
+
+  <div class="controls" role="group" aria-label="Filters and settings">
+    <div class="ctl">
+      <label for="sl">Service level</label>
+      <select id="sl">
+        <option value="0.90">90%</option>
+        <option value="0.95" selected>95%</option>
+        <option value="0.975">97.5%</option>
+        <option value="0.98">98%</option>
+        <option value="0.99">99%</option>
+      </select>
+    </div>
+    <div class="ctl">
+      <label for="rv">Review cycle</label>
+      <select id="rv">
+        <option value="7" selected>Weekly</option>
+        <option value="14">Every 2 weeks</option>
+        <option value="30">Monthly</option>
+      </select>
+    </div>
+    <div class="ctl">
+      <label for="sup">Supplier</label>
+      <select id="sup"><option value="">All suppliers</option></select>
+    </div>
+    <div class="ctl">
+      <label for="st">Status</label>
+      <select id="st"><option value="">All statuses</option></select>
+    </div>
+    <div class="ctl grow">
+      <label for="q">Search</label>
+      <input type="search" id="q" placeholder="SKU or product name">
+    </div>
+  </div>
+
+  <section class="kpis" aria-label="Key numbers">
+    <div class="kpi"><div class="label" id="k1l"></div><div class="value" id="k1"></div><div class="note">SKUs with zero on hand</div></div>
+    <div class="kpi"><div class="label" id="k2l"></div><div class="value" id="k2"></div><div class="note" id="k2n"></div></div>
+    <div class="kpi"><div class="label">Suggested purchase orders</div><div class="value" id="k3"></div><div class="note" id="k3n"></div></div>
+    <div class="kpi"><div class="label" id="k4l"></div><div class="value" id="k4"></div><div class="note">Cash tied up in &gt; 120 days of cover</div></div>
+  </section>
+
+  <section class="detail card" id="detail" aria-live="polite"></section>
+
+  <section class="grid2">
+    <div class="card">
+      <h2>SKUs by status</h2>
+      <p class="hint">Click a row to filter the table.</p>
+      <div class="statusbar" id="statusbar"></div>
+    </div>
+    <div class="card">
+      <h2>Suggested order value by supplier</h2>
+      <p class="hint">What to send each supplier today.</p>
+      <div class="supbars" id="supbars"></div>
+    </div>
+  </section>
+
+  <section class="card tablecard">
+    <div class="head">
+      <div><h2 style="margin:0">Reorder plan</h2><p class="hint" style="margin:0" id="rowcount"></p></div>
+      <span class="hint" style="margin:0">Click a product for its demand and stock projection</span>
+    </div>
+    <div class="scroll">
+      <table id="tbl">
+        <thead><tr>
+          <th class="left" data-k="name" tabindex="0">Product</th>
+          <th class="left" data-k="statusRank" tabindex="0">Status</th>
+          <th data-k="onHand" tabindex="0">On hand</th>
+          <th data-k="onOrder" tabindex="0">On order</th>
+          <th data-k="d" tabindex="0">Avg / day</th>
+          <th data-k="cover" tabindex="0">Days cover</th>
+          <th data-k="ss" tabindex="0">Safety stock</th>
+          <th data-k="rop" tabindex="0">Reorder pt</th>
+          <th data-k="qty" tabindex="0">Order qty</th>
+          <th data-k="value" tabindex="0">Order $</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card method" style="margin-top:16px">
+    <h2>How the numbers are calculated</h2>
+    <p>For each SKU, demand rate <code>d</code> and its variability <code>σd</code> come from the last 56 days of sales. Supplier lead time <code>L</code> has its own variability <code>σL</code>.</p>
+    <p><b>Safety stock</b> = <code>z × √(L·σd² + d²·σL²)</code>, where <code>z</code> is set by the service level (95% → 1.645). It covers both demand spikes and late deliveries.<br>
+    <b>Reorder point</b> = <code>d × L + safety stock</code>.<br>
+    <b>Order quantity</b> = the larger of EOQ (<code>√(2·annual demand·order cost / holding cost)</code>) and enough to reach <code>reorder point + d × review cycle</code>, rounded up to whole supplier cases. Stock already on order counts toward the position.</p>
+    <p>The same logic runs as a plain Python script (<code>reorder_engine.py</code>), so it can run nightly against a Shopify, ERP or Google Sheets export and email the POs.</p>
+  </section>
+
+  <footer>Built by Ahmad Anis · Python &amp; AI automation for operations · <a href="https://github.com/ahmadanis3620-hue/automation-portfolio">Source on GitHub</a></footer>
+</div>
+
+<script src="data.js"></script>
+<script>
+(() => {
+  const DATA = window.REORDER_DATA;
+  const P = DATA.params;
+  const Z = { "0.90": 1.281552, "0.95": 1.644854, "0.975": 1.959964, "0.98": 2.053749, "0.99": 2.326348 };
+  const STATUS = [
+    { key: "Stockout",     color: "var(--critical)", icon: "x" },
+    { key: "Reorder now",  color: "var(--serious)",  icon: "alert" },
+    { key: "Reorder soon", color: "var(--warning)",  icon: "clock" },
+    { key: "Healthy",      color: "var(--good)",     icon: "check" },
+    { key: "Overstock",    color: "var(--info)",     icon: "up" },
+  ];
+  const SRANK = Object.fromEntries(STATUS.map((s, i) => [s.key, i]));
+  const $ = (id) => document.getElementById(id);
+  const fmt$ = (n) => "$" + Math.round(n).toLocaleString();
+  const fmtN = (n) => Math.round(n).toLocaleString();
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  function icon(kind, color) {
+    const paths = {
+      x: '<path d="M4 4l6 6M10 4l-6 6"/>',
+      alert: '<path d="M7 3.5v4"/><circle cx="7" cy="10" r=".6" fill="#fff" stroke="none"/>',
+      clock: '<path d="M7 4v3.2l2 1.3"/>',
+      check: '<path d="M4 7.2l2 2 4-4.2"/>',
+      up: '<path d="M7 10V4.5M4.6 6.8L7 4.4l2.4 2.4"/>',
+    };
+    return `<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="7" fill="${color}"/><g stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round">${paths[kind]}</g></svg>`;
+  }
+  const chip = (status) => { const s = STATUS[SRANK[status]]; return `<span class="chip">${icon(s.icon, s.color)}${status}</span>`; };
+
+  // ---- same math as reorder_engine.py ----
+  function mean(a) { return a.reduce((x, y) => x + y, 0) / a.length; }
+  function pstdev(a) { const m = mean(a); return Math.sqrt(mean(a.map((x) => (x - m) ** 2))); }
+
+  function plan(it, z, review) {
+    const recent = it.history.slice(-P.forecastWindow);
+    const d = mean(recent), sd = pstdev(recent);
+    const L = +it.lead_time_days, Lsd = +it.lead_time_std, cost = +it.unit_cost, pack = +it.case_pack;
+    const onHand = +it.on_hand, onOrder = +it.on_order, position = onHand + onOrder;
+    const safety = z * Math.sqrt(L * sd * sd + d * d * Lsd * Lsd);
+    const rop = d * L + safety;
+    const eoq = d > 0 ? Math.sqrt((2 * d * 365 * +it.order_cost) / (cost * +it.holding_rate)) : 0;
+    const cover = d > 0 ? onHand / d : Infinity;
+    let status;
+    if (onHand === 0) status = "Stockout";
+    else if (position <= rop) status = "Reorder now";
+    else if (position <= rop + d * P.watchDays) status = "Reorder soon";
+    else if (cover > P.overstockDays) status = "Overstock";
+    else status = "Healthy";
+    let qty = 0;
+    if (status === "Stockout" || status === "Reorder now") {
+      qty = Math.max(rop + d * review - position, eoq);
+      qty = Math.ceil(qty / pack) * pack;
+    }
+    const excess = status === "Overstock" ? Math.max(0, onHand - d * P.overstockDays) * cost : 0;
+    return { ...it, d, sd, L, cost, onHand, onOrder, position, ss: Math.ceil(safety), rop: Math.ceil(rop),
+      eoq: Math.ceil(eoq), cover, status, statusRank: SRANK[status], qty, value: qty * cost, excess,
+      riskBeforeArrival: onHand < d * L };
+  }
+
+  // ---- state ----
+  const state = { sort: "statusRank", dir: 1, status: "", selected: null };
+  let rows = [];
+
+  const suppliers = [...new Set(DATA.items.map((i) => i.supplier))].sort();
+  $("sup").insertAdjacentHTML("beforeend", suppliers.map((s) => `<option>${esc(s)}</option>`).join(""));
+  $("st").insertAdjacentHTML("beforeend", STATUS.map((s) => `<option>${s.key}</option>`).join(""));
+
+  function recompute() {
+    const z = Z[$("sl").value], review = +$("rv").value;
+    rows = DATA.items.map((it) => plan(it, z, review));
+    render();
+  }
+
+  function filtered() {
+    const sup = $("sup").value, q = $("q").value.trim().toLowerCase(), st = $("st").value;
+    return rows.filter((r) => (!sup || r.supplier === sup) && (!st || r.status === st) &&
+      (!q || r.sku.toLowerCase().includes(q) || r.name.toLowerCase().includes(q)));
+  }
+
+  function render() {
+    const scope = rows.filter((r) => !$("sup").value || r.supplier === $("sup").value);
+    const by = (k) => scope.filter((r) => r.status === k);
+    const orders = scope.filter((r) => r.qty > 0);
+    $("k1l").innerHTML = chip("Stockout"); $("k1").textContent = by("Stockout").length;
+    $("k2l").innerHTML = chip("Reorder now"); $("k2").textContent = by("Reorder now").length;
+    const risk = scope.filter((r) => r.qty > 0 && r.riskBeforeArrival).length;
+    $("k2n").textContent = `${risk} will run out before a new PO arrives`;
+    $("k3").textContent = fmt$(orders.reduce((a, r) => a + r.value, 0));
+    $("k3n").textContent = `${orders.length} lines across ${new Set(orders.map((r) => r.supplier)).size} suppliers`;
+    $("k4l").innerHTML = chip("Overstock"); $("k4").textContent = fmt$(scope.reduce((a, r) => a + r.excess, 0));
+
+    // status bars
+    const max = Math.max(1, ...STATUS.map((s) => by(s.key).length));
+    $("statusbar").innerHTML = STATUS.map((s) => {
+      const n = by(s.key).length;
+      return `<div class="srow ${state.status === s.key ? "active" : ""}" data-s="${s.key}" role="button" tabindex="0" aria-pressed="${state.status === s.key}">
+        ${chip(s.key)}<div class="track"><div class="fill" style="width:${(n / max) * 100}%;background:${s.color}"></div></div><div class="n">${n}</div></div>`;
+    }).join("");
+
+    // supplier bars
+    const sv = suppliers.map((s) => ({ s, v: rows.filter((r) => r.supplier === s).reduce((a, r) => a + r.value, 0),
+      n: rows.filter((r) => r.supplier === s && r.qty > 0).length }));
+    const smax = Math.max(1, ...sv.map((x) => x.v));
+    $("supbars").innerHTML = sv.map((x) => `<div class="sbar" title="${esc(x.s)}: ${fmt$(x.v)} across ${x.n} line(s)">
+      <div>${esc(x.s)}</div><div class="track"><div class="fill" style="width:${(x.v / smax) * 100}%;${x.v ? "" : "background:var(--grid)"}"></div></div>
+      <div class="v">${x.v ? fmt$(x.v) : "—"}</div></div>`).join("");
+
+    // table
+    const list = filtered().sort((a, b) => {
+      const k = state.sort; let x = a[k], y = b[k];
+      if (typeof x === "string") return x.localeCompare(y) * state.dir;
+      return ((x - y) || (b.value - a.value)) * state.dir;
+    });
+    document.querySelectorAll("th").forEach((th) => {
+      th.classList.toggle("sorted", th.dataset.k === state.sort);
+      th.setAttribute("aria-sort", th.dataset.k === state.sort ? (state.dir > 0 ? "ascending" : "descending") : "none");
+    });
+    $("rowcount").textContent = `${list.length} of ${rows.length} SKUs`;
+    document.querySelector("#tbl tbody").innerHTML = list.map((r) => `
+      <tr data-sku="${r.sku}" tabindex="0" class="${state.selected === r.sku ? "sel" : ""}">
+        <td class="left"><div class="name">${esc(r.name)}</div><div class="meta">${r.sku} · ${esc(r.supplier)}</div></td>
+        <td class="left">${chip(r.status)}${r.qty && r.riskBeforeArrival ? '<div class="warnflag">Runs out before PO lands</div>' : ""}</td>
+        <td>${fmtN(r.onHand)}</td><td>${r.onOrder ? fmtN(r.onOrder) : "—"}</td>
+        <td>${r.d.toFixed(1)}</td><td>${isFinite(r.cover) ? Math.round(r.cover) : "—"}</td>
+        <td>${fmtN(r.ss)}</td><td>${fmtN(r.rop)}</td>
+        <td class="order">${r.qty ? fmtN(r.qty) : "—"}</td><td>${r.qty ? fmt$(r.value) : "—"}</td>
+      </tr>`).join("");
+
+    if (state.selected) renderDetail(rows.find((r) => r.sku === state.selected));
+  }
+
+  // ---- detail charts (plain SVG) ----
+  function lineChart(el, cfg) {
+    const W = el.clientWidth || 520, H = 200, m = { t: 10, r: 12, b: 24, l: 40 };
+    const iw = W - m.l - m.r, ih = H - m.t - m.b;
+    const n = cfg.series.length;
+    const ymax = Math.max(...cfg.series, ...(cfg.refs || []).map((r) => r.v)) * 1.1 || 1;
+    const x = (i) => m.l + (i / (n - 1)) * iw, y = (v) => m.t + ih - (v / ymax) * ih;
+    const ticks = 4, grid = [];
+    for (let k = 0; k <= ticks; k++) {
+      const v = (ymax / ticks) * k;
+      grid.push(`<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${m.l - 6}" y="${y(v) + 4}" text-anchor="end">${fmtN(v)}</text>`);
+    }
+    const xl = cfg.xLabels.map(([i, t]) => `<text x="${x(i)}" y="${H - 6}" text-anchor="middle">${t}</text>`).join("");
+    const path = cfg.series.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join("");
+    const refs = (cfg.refs || []).map((r) => `<line x1="${m.l}" x2="${W - m.r}" y1="${y(r.v)}" y2="${y(r.v)}" stroke="${r.color}" stroke-width="2" stroke-dasharray="5 4"/>`).join("");
+    const area = cfg.area ? `<path d="${path}L${x(n - 1)},${y(0)}L${x(0)},${y(0)}Z" fill="var(--accent)" opacity=".08"/>` : "";
+    el.innerHTML = `<svg width="${W}" height="${H}" role="img" aria-label="${esc(cfg.label)}">${grid.join("")}${xl}${area}
+      ${refs}<path d="${path}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
+      <line class="xh" y1="${m.t}" y2="${m.t + ih}" stroke="var(--muted)" stroke-width="1" visibility="hidden"/>
+      <circle class="pt" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2" visibility="hidden"/>
+      <rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/></svg><div class="tip"></div>`;
+    const svg = el.querySelector("svg"), tip = el.querySelector(".tip"), xh = svg.querySelector(".xh"), pt = svg.querySelector(".pt");
+    svg.addEventListener("mousemove", (e) => {
+      const b = svg.getBoundingClientRect();
+      const i = Math.max(0, Math.min(n - 1, Math.round(((e.clientX - b.left - m.l) / iw) * (n - 1))));
+      xh.setAttribute("x1", x(i)); xh.setAttribute("x2", x(i)); xh.setAttribute("visibility", "visible");
+      pt.setAttribute("cx", x(i)); pt.setAttribute("cy", y(cfg.series[i])); pt.setAttribute("visibility", "visible");
+      tip.innerHTML = cfg.tip(i);
+      tip.style.display = "block";
+      const left = x(i) + 12 + tip.offsetWidth > W ? x(i) - tip.offsetWidth - 12 : x(i) + 12;
+      tip.style.left = left + "px"; tip.style.top = (el.querySelector("svg").offsetTop + 8) + "px";
+    });
+    svg.addEventListener("mouseleave", () => { tip.style.display = "none"; xh.setAttribute("visibility", "hidden"); pt.setAttribute("visibility", "hidden"); });
+  }
+
+  const shortDate = (iso) => new Date(iso + "T00:00:00").toLocaleDateString(undefined, { month: "short", day: "numeric" });
+
+  function renderDetail(r) {
+    const el = $("detail");
+    if (!r) { el.classList.remove("open"); return; }
+    el.classList.add("open");
+    el.innerHTML = `
+      <div class="top">
+        <div><h2 style="font-size:17px;margin:0">${esc(r.name)}</h2><div class="hint" style="margin:2px 0 0">${r.sku} · ${esc(r.category)} · ${esc(r.supplier)} · ${r.L}-day lead time (±${r.lead_time_std})</div></div>
+        <div style="display:flex;gap:10px;align-items:center">${chip(r.status)}<button class="btn" id="closeDetail" type="button">Close</button></div>
+      </div>
+      <div class="facts">
+        <div class="fact"><div class="k">On hand</div><div class="v">${fmtN(r.onHand)}</div></div>
+        <div class="fact"><div class="k">On order</div><div class="v">${fmtN(r.onOrder)}</div></div>
+        <div class="fact"><div class="k">Avg demand / day</div><div class="v">${r.d.toFixed(1)} ± ${r.sd.toFixed(1)}</div></div>
+        <div class="fact"><div class="k">Safety stock</div><div class="v">${fmtN(r.ss)}</div></div>
+        <div class="fact"><div class="k">Reorder point</div><div class="v">${fmtN(r.rop)}</div></div>
+        <div class="fact"><div class="k">EOQ</div><div class="v">${fmtN(r.eoq)}</div></div>
+        <div class="fact"><div class="k">Suggested order</div><div class="v">${r.qty ? fmtN(r.qty) + " units · " + fmt$(r.value) : "None needed"}</div></div>
+      </div>
+      <div class="charts">
+        <div class="chart"><h3>Daily units sold, last 90 days</h3>
+          <div class="legend"><span style="color:var(--accent)"><i class="sw-line"></i>Units sold</span><span style="color:var(--ref)"><i class="sw-dash"></i>Forecast rate (${r.d.toFixed(1)}/day)</span></div>
+          <div id="c1"></div></div>
+        <div class="chart"><h3>Projected on-hand, next 60 days</h3>
+          <div class="legend"><span style="color:var(--accent)"><i class="sw-line"></i>On hand${r.qty ? " (if PO placed today)" : ""}</span><span style="color:var(--ref)"><i class="sw-dash"></i>Reorder point</span><span style="color:var(--critical)"><i class="sw-dash"></i>Safety stock</span></div>
+          <div id="c2"></div></div>
+      </div>`;
+    $("closeDetail").onclick = () => { state.selected = null; el.classList.remove("open"); render(); };
+
+    const hist = r.history.slice(-90), dates = DATA.dates.slice(-90);
+    lineChart($("c1"), {
+      label: `Daily units sold for ${r.name}`, series: hist, refs: [{ v: r.d, color: "var(--ref)" }],
+      xLabels: [[0, shortDate(dates[0])], [45, shortDate(dates[45])], [89, shortDate(dates[89])]],
+      tip: (i) => `${shortDate(dates[i])}: <b>${hist[i]}</b> units`,
+    });
+
+    // projection: existing on-order lands at half the lead time, today's PO lands at the full lead time
+    const proj = [];
+    let oh = r.onHand;
+    for (let t = 0; t <= 60; t++) {
+      if (t > 0) oh = Math.max(0, oh - r.d);
+      if (t === Math.round(r.L / 2) && r.onOrder) oh += r.onOrder;
+      if (t === Math.round(r.L) && r.qty) oh += r.qty;
+      proj.push(oh);
+    }
+    lineChart($("c2"), {
+      label: `Projected on-hand units for ${r.name}`, series: proj, area: true,
+      refs: [{ v: r.rop, color: "var(--ref)" }, { v: r.ss, color: "var(--critical)" }],
+      xLabels: [[0, "Today"], [30, "+30d"], [60, "+60d"]],
+      tip: (i) => `Day ${i}: <b>${fmtN(proj[i])}</b> on hand${proj[i] === 0 ? " · <b style='color:var(--critical)'>out of stock</b>" : ""}`,
+    });
+    el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  // ---- events ----
+  ["sl", "rv"].forEach((id) => $(id).addEventListener("change", recompute));
+  ["sup", "q"].forEach((id) => $(id).addEventListener("input", render));
+  $("st").addEventListener("change", () => { state.status = $("st").value; render(); });
+  $("statusbar").addEventListener("click", (e) => {
+    const row = e.target.closest(".srow"); if (!row) return;
+    state.status = state.status === row.dataset.s ? "" : row.dataset.s; $("st").value = state.status; render();
+  });
+  $("statusbar").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.target.click(); } });
+  document.querySelector("thead").addEventListener("click", (e) => {
+    const th = e.target.closest("th"); if (!th) return;
+    if (state.sort === th.dataset.k) state.dir *= -1; else { state.sort = th.dataset.k; state.dir = ["name", "statusRank"].includes(th.dataset.k) ? 1 : -1; }
+    render();
+  });
+  document.querySelector("thead").addEventListener("keydown", (e) => { if (e.key === "Enter") e.target.click(); });
+  const tbody = document.querySelector("#tbl tbody");
+  tbody.addEventListener("click", (e) => {
+    const tr = e.target.closest("tr"); if (!tr) return;
+    state.selected = tr.dataset.sku; render();
+  });
+  tbody.addEventListener("keydown", (e) => { if (e.key === "Enter") e.target.closest("tr")?.click(); });
+
+  $("exportBtn").addEventListener("click", () => {
+    const lines = [["supplier", "sku", "name", "order_qty", "unit_cost", "line_value"]];
+    rows.filter((r) => r.qty).sort((a, b) => a.supplier.localeCompare(b.supplier) || a.sku.localeCompare(b.sku))
+      .forEach((r) => lines.push([r.supplier, r.sku, r.name, r.qty, r.cost.toFixed(2), r.value.toFixed(2)]));
+    const csv = lines.map((l) => l.map((v) => /[",]/.test(v) ? `"${String(v).replace(/"/g, '""')}"` : v).join(",")).join("\n");
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = `purchase_orders_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click(); URL.revokeObjectURL(a.href);
+  });
+
+  $("themeBtn").addEventListener("click", () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+  });
+  try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+  window.addEventListener("resize", () => { if (state.selected) renderDetail(rows.find((r) => r.sku === state.selected)); });
+
+  recompute();
+})();
+</script>
+</body>
+</html>
