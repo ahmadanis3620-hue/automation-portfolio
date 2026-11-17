@@ -3,170 +3,248 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Supplier Compliance Dashboard</title>
-<meta name="description" content="Demo: supplier compliance, certification expiry, material traceability and supplier scorecards for apparel sourcing (mock data, Power BI-style layout).">
+<title>Supplier Compliance Report</title>
 <style>
-:root{color-scheme:light;--bg:#f3f2f1;--surface:#fff;--surface-2:#f0efec;--border:#e1dfdd;--text:#0b0b0b;--text-2:#52514e;--muted:#7a7974;--grid:#edebe9;--accent:#2a78d6;--accent-soft:#cde2fb;--good:#0ca30c;--warning:#fab219;--serious:#ec835a;--critical:#d03b3b;--bar:#2a78d6;--shadow:0 1px 2px rgba(0,0,0,.06)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111110;--surface:#1a1a19;--surface-2:#232321;--border:#33332f;--text:#f0efec;--text-2:#c3c2b7;--muted:#8f8e86;--grid:#2c2c29;--accent:#3987e5;--accent-soft:#1c3a63;--bar:#3987e5;--shadow:none}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#111110;--surface:#1a1a19;--surface-2:#232321;--border:#33332f;--text:#f0efec;--text-2:#c3c2b7;--muted:#8f8e86;--grid:#2c2c29;--accent:#3987e5;--accent-soft:#1c3a63;--bar:#3987e5;--shadow:none}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
-.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 48px}
-header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}
-h1{font-size:20px;margin:0 0 4px}.sub{color:var(--text-2);margin:0;max-width:760px}
-.badge{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:99px;margin-bottom:6px}
-.btn{font:inherit;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer}
-.layout{display:grid;grid-template-columns:200px 1fr;gap:12px}
-.slicers{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px;box-shadow:var(--shadow);align-self:start}
-.slicers h3{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 6px}
-.slicers label{display:flex;gap:6px;align-items:center;margin:4px 0;font-size:13px;cursor:pointer}
-.slicers .grp{margin-bottom:14px}
-select{font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;width:100%}
-.main{display:grid;gap:12px;min-width:0}
-.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-.tile,.card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;box-shadow:var(--shadow);min-width:0}
-.tile .l{font-size:12px;color:var(--text-2)}.tile .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}.tile .n{font-size:11px;color:var(--muted)}
-.row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
-.card h2{font-size:13px;margin:0 0 2px}.hint{font-size:11px;color:var(--muted);margin:0 0 8px}
-.scroll{overflow-x:auto}
+:root{--pb1:#118DFF;--pb2:#12239E;--pb3:#E66C37;--pb4:#6B007B;--pb5:#E044A7;--pb6:#744EC2;--pb7:#D9B300;--pb8:#D64550;--ok:#1AAB40;--warn:#D9B300;--bad:#D64550;--ink:#252423;--ink2:#605E5C;--ink3:#8A8886;--line:#EDEBE9;--canvas:#EAEAEA;--card:#FFFFFF;--bar:#1F1F1F}
+*{box-sizing:border-box}
+body{margin:0;font:12px/1.35 "Segoe UI","Segoe UI Web",Tahoma,Arial,sans-serif;color:var(--ink);background:#F3F2F1}
+.app{display:grid;grid-template-rows:40px 34px 1fr 30px;height:100vh;min-height:640px}
+.top{background:var(--bar);color:#fff;display:flex;align-items:center;gap:14px;padding:0 14px}
+.logo{width:22px;height:22px;border-radius:4px;background:linear-gradient(135deg,#F2C811 0 50%,#E8A900 50%);display:grid;place-items:center;font-weight:700;color:#1f1f1f;font-size:12px}
+.top .ws{opacity:.75}.top .sep{opacity:.4}.top b{font-weight:600}
+.top .right{margin-left:auto;display:flex;gap:16px;opacity:.85}
+.ribbon{background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:18px;padding:0 14px;color:var(--ink2)}
+.ribbon span{cursor:default}.ribbon .r{margin-left:auto;color:var(--ink3)}
+.body{display:grid;grid-template-columns:1fr 230px;min-height:0}
+.stage{overflow:auto;padding:14px;background:var(--canvas)}
+.page{background:#F6F6F6;max-width:1280px;margin:0 auto;padding:12px;display:none;box-shadow:0 0 0 1px #d6d6d6}
+.page.on{display:block}
+.brand{display:flex;justify-content:space-between;align-items:center;margin:0 0 10px}
+.brand h1{font-size:20px;font-weight:600;margin:0;color:#252423}
+.brand .co{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--pb2)}
+.brand .mk{width:26px;height:26px;border-radius:50%;background:var(--pb2);color:#fff;display:grid;place-items:center;font-size:12px}
+.grid{display:grid;gap:10px}
+.v{background:var(--card);border:1px solid #e1e1e1;padding:8px 10px;min-width:0;position:relative}
+.v h3{margin:0 0 6px;font-size:12px;font-weight:600;color:#252423}
+.k{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:10px}
+.k .v{text-align:center;padding:10px 6px}.k .n{font-size:28px;font-weight:300;color:#252423;font-variant-numeric:tabular-nums}.k .l{color:var(--ink2);font-size:11px}.k .d{font-size:11px;margin-top:2px}
+.r2{grid-template-columns:1.1fr 1fr 1.3fr}.r3{grid-template-columns:1.4fr 1fr}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:6px 8px;text-align:left;border-top:1px solid var(--grid);white-space:nowrap}
-th{font-size:11px;color:var(--muted);font-weight:600;border-top:0;text-transform:uppercase;letter-spacing:.03em;cursor:pointer}
-td.num,th.num{text-align:right}
-tbody tr{cursor:pointer}tbody tr:hover,tbody tr.sel{background:var(--surface-2)}
-.chip{display:inline-flex;align-items:center;gap:5px;font-weight:600}
-.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
-.meter{display:inline-block;width:70px;height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;vertical-align:middle;margin-right:6px}.meter i{display:block;height:100%;border-radius:0 4px 4px 0}
-.bars{display:flex;flex-direction:column;gap:8px}
-.bar{display:grid;grid-template-columns:120px 1fr 40px;gap:8px;align-items:center;font-size:12px}
-.bar .t{height:14px;background:var(--surface-2);border-radius:3px;overflow:hidden}.bar .t i{display:block;height:100%;border-radius:0 3px 3px 0}
-.bar .n{text-align:right;color:var(--text-2);font-variant-numeric:tabular-nums}
-.trace{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}
-.node{flex:1 1 140px;border:1px solid var(--border);border-radius:6px;padding:8px 10px;background:var(--surface-2)}
-.node .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.node .v{font-weight:600}.node .s{font-size:11px;color:var(--text-2)}
-.arrow{align-self:center;color:var(--muted)}
-.model{font-size:12px;color:var(--text-2)}.model code{background:var(--surface-2);padding:1px 5px;border-radius:4px}
-footer{margin-top:18px;text-align:center;font-size:12px;color:var(--muted)}footer a{color:var(--accent)}
-@media (max-width:1000px){.tiles{grid-template-columns:repeat(3,1fr)}.row{grid-template-columns:1fr}}
-@media (max-width:760px){.layout{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,1fr)}}
+th{font-weight:600;text-align:left;padding:5px 6px;border-bottom:1px solid #c8c6c4;white-space:nowrap;color:#252423;cursor:pointer;font-size:11px}
+td{padding:4px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td.n,th.n{text-align:right}
+tbody tr:hover{background:#F3F2F1}tr.sel td{background:#DEECF9}
+.hm{display:block;text-align:center;font-weight:600;padding:3px 0}
+.scroll{overflow:auto;max-height:330px}
+.tabs{background:#fff;border-top:1px solid var(--line);display:flex;align-items:stretch;padding-left:8px;gap:2px;overflow-x:auto}
+.tab{border:0;background:none;font:inherit;padding:0 14px;color:var(--ink2);cursor:pointer;border-top:3px solid transparent;white-space:nowrap}
+.tab.on{color:#252423;font-weight:600;border-top-color:#F2C811;background:#F3F2F1}
+.fp{background:#fff;border-left:1px solid var(--line);overflow:auto;padding:10px 12px}
+.fp h4{margin:0 0 8px;font-size:13px;font-weight:600;display:flex;justify-content:space-between}
+.fc{border:1px solid var(--line);padding:8px;margin-bottom:8px}
+.fc .t{font-weight:600;margin-bottom:4px;display:flex;justify-content:space-between}
+.fc .t a{font-weight:400;color:var(--pb1);cursor:pointer}
+.fc label{display:flex;gap:6px;align-items:center;padding:2px 0;cursor:pointer}
+.fc .is{color:var(--ink3);font-size:11px}
+svg text{font-family:inherit}
+.tip{position:fixed;pointer-events:none;background:#fff;border:1px solid #c8c6c4;box-shadow:0 2px 8px rgba(0,0,0,.18);padding:6px 9px;font-size:12px;display:none;z-index:20;max-width:260px}
+.tip b{font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:10px;color:var(--ink2);font-size:11px;margin-bottom:4px}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.note{color:var(--ink3);font-size:11px;margin-top:8px}
+.foot{display:flex;justify-content:space-between;color:var(--ink3);font-size:11px;margin-top:8px}
+.foot a{color:var(--ink3)}
+.lotpick{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.lotpick button{font:inherit;border:1px solid #c8c6c4;background:#fff;padding:4px 10px;cursor:pointer}
+.lotpick button.on{background:#252423;color:#fff;border-color:#252423}
+@media (max-width:1000px){.body{grid-template-columns:1fr}.fp{display:none}.k{grid-template-columns:repeat(3,1fr)}.r2,.r3{grid-template-columns:1fr}.app{height:auto}}
+@media (max-width:560px){.k{grid-template-columns:repeat(2,1fr)}.top .ws,.top .sep,.top .right{display:none}.ribbon{display:none}.app{grid-template-rows:40px 1fr 34px}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div><span class="badge">Portfolio demo · mock data · Power BI-style layout</span>
-  <h1>Supplier Compliance & Material Traceability</h1>
-  <p class="sub">For an apparel brand sourcing from mills, trim suppliers and cut-and-sew factories: certification coverage and expiry, missing documents, inspection results, supplier scorecards, and lot-level traceability from fiber to finished style. Click any supplier or lot to drill in.</p></div>
-  <button class="btn" id="themeBtn" type="button">◐ Theme</button>
-</header>
+<div class="app">
+  <div class="top"><div class="logo">▮</div><span class="ws">Sourcing Analytics</span><span class="sep">/</span><b>Supplier Compliance &amp; Traceability</b><div class="right"><span>Data updated 11/17/26, 6:00 AM</span><span>Sample data</span></div></div>
+  <div class="ribbon"><span>File</span><span>Export</span><span>Share</span><span>Subscribe to report</span><span>Bookmarks</span><span class="r">Reading view</span></div>
+  <div class="body">
+    <div class="stage">
+      <!-- OVERVIEW -->
+      <section class="page on" id="pg0">
+        <div class="brand"><h1>Supplier Compliance Overview</h1><div class="co"><span class="mk">MA</span>Meridian Apparel Co.</div></div>
+        <div class="k" id="kpis"></div>
+        <div class="grid r2" style="margin-bottom:10px">
+          <div class="v"><h3>Certificates by status</h3><div id="donut"></div></div>
+          <div class="v"><h3>Compliance score by country</h3><div id="ctry"></div></div>
+          <div class="v"><h3>Avg compliance score and open findings, last 12 months</h3><div class="legend"><span><i style="background:var(--pb1)"></i>Avg score</span><span><i style="background:var(--pb3)"></i>Open findings</span></div><div id="trend"></div></div>
+        </div>
+        <div class="grid r3">
+          <div class="v"><h3>Exceptions requiring action</h3><div class="scroll" style="max-height:230px"><table id="exc"><thead><tr><th>Supplier</th><th>Exception</th><th>Owner</th><th class="n">Days</th></tr></thead><tbody></tbody></table></div></div>
+          <div class="v"><h3>Spend at risk by supplier type ($K, last 90 days)</h3><div id="spend"></div></div>
+        </div>
+        <div class="foot"><span>Click a donut slice or a country bar to cross-filter the page.</span><span>Sample data · fictional suppliers</span></div>
+      </section>
 
-<div class="layout">
-  <aside class="slicers" aria-label="Filters">
-    <div class="grp"><h3>Supplier type</h3><div id="fType"></div></div>
-    <div class="grp"><h3>Country</h3><select id="fCountry"><option value="">All countries</option></select></div>
-    <div class="grp"><h3>Certification</h3><select id="fCert"><option value="">All certifications</option></select></div>
-    <div class="grp"><h3>Risk</h3><div id="fRisk"></div></div>
-    <button class="btn" id="reset" type="button" style="width:100%">Clear filters</button>
-  </aside>
+      <!-- SCORECARD -->
+      <section class="page" id="pg1">
+        <div class="brand"><h1>Supplier Scorecard</h1><div class="co"><span class="mk">MA</span>Meridian Apparel Co.</div></div>
+        <div class="v"><h3>Weighted compliance score: certification 35% · documentation 25% · inspections 25% · on-time delivery 15%</h3>
+          <div class="scroll" style="max-height:520px"><table id="score"><thead><tr><th data-k="name">Supplier</th><th data-k="tier">Tier</th><th data-k="type">Type</th><th data-k="country">Country</th><th class="n" data-k="cert">Certification</th><th class="n" data-k="docs">Documentation</th><th class="n" data-k="insp">Inspection</th><th class="n" data-k="otd">On-time</th><th class="n" data-k="score">Score</th><th class="n" data-k="spend">Spend $K</th></tr></thead><tbody></tbody></table></div>
+        </div>
+        <div class="foot"><span>Conditional formatting: green ≥ 90, yellow 75–89, red &lt; 75. Click a column to sort.</span><span>Sample data</span></div>
+      </section>
 
-  <div class="main">
-    <section class="tiles" id="tiles" aria-label="Key numbers"></section>
+      <!-- CERTIFICATIONS -->
+      <section class="page" id="pg2">
+        <div class="brand"><h1>Certification Expiry Timeline</h1><div class="co"><span class="mk">MA</span>Meridian Apparel Co.</div></div>
+        <div class="v"><h3>Certificate validity by supplier (today = Nov 17, 2026)</h3><div class="legend"><span><i style="background:var(--ok)"></i>Valid</span><span><i style="background:var(--warn)"></i>Expires ≤ 60 days</span><span><i style="background:var(--bad)"></i>Expired / missing</span></div><div id="gantt"></div></div>
+        <div class="foot"><span>Renewal reminders go to the supplier and buyer at 90, 60 and 30 days.</span><span>Sample data</span></div>
+      </section>
 
-    <div class="row">
-      <div class="card"><h2>Certification status</h2><p class="hint">Valid, expiring within 30/60/90 days, expired, or missing documents.</p><div class="bars" id="certBars"></div></div>
-      <div class="card"><h2>Compliance score by supplier type</h2><p class="hint">Average weighted score (0–100).</p><div class="bars" id="typeBars"></div></div>
+      <!-- TRACE -->
+      <section class="page" id="pg3">
+        <div class="brand"><h1>Material Traceability</h1><div class="co"><span class="mk">MA</span>Meridian Apparel Co.</div></div>
+        <div class="v"><h3>Finished-goods lot → upstream chain</h3><div class="lotpick" id="lots"></div><div id="flow"></div><div class="note" id="flownote"></div></div>
+        <div class="foot"><span>Each link carries the document that proves it: transaction certificate, mill lot, dye batch, PO receipt.</span><span>Sample data</span></div>
+      </section>
     </div>
 
-    <div class="card"><h2>Supplier scorecard</h2><p class="hint">Score = certifications 35% · documentation 25% · inspections 25% · on-time delivery 15%. Click a row for its certifications and lots.</p>
-      <div class="scroll"><table id="sc"><thead><tr><th data-k="name">Supplier</th><th data-k="type">Type</th><th data-k="country">Country</th><th class="num" data-k="score">Score</th><th class="num" data-k="docs">Docs complete</th><th class="num" data-k="insp">Inspection pass</th><th class="num" data-k="otd">On-time</th><th data-k="risk">Risk</th></tr></thead><tbody></tbody></table></div>
-    </div>
-
-    <div class="row">
-      <div class="card"><h2>Exceptions: action needed</h2><p class="hint">Expired or soon-expiring certifications, missing documents, failed inspections.</p><div class="scroll"><table id="ex"><thead><tr><th>Supplier</th><th>Issue</th><th>Due / since</th></tr></thead><tbody></tbody></table></div></div>
-      <div class="card"><h2 id="detTitle">Supplier detail</h2><p class="hint" id="detHint">Select a supplier in the scorecard.</p><div id="det"></div></div>
-    </div>
-
-    <div class="card"><h2>Material traceability</h2><p class="hint">Pick a finished-goods lot to trace it back through the documented chain.</p>
-      <select id="lotSel" style="max-width:360px;margin-bottom:10px"></select><div class="trace" id="trace"></div></div>
-
-    <div class="card model"><h2>How this is built in Power BI</h2>
-      <p>Star schema: <code>Dim_Supplier</code>, <code>Dim_Certification</code>, <code>Dim_Material</code>, <code>Dim_Date</code> with facts <code>Fact_CertRecord</code> (expiry, status), <code>Fact_Inspection</code>, <code>Fact_PO_Receipt</code> and <code>Fact_LotTrace</code>. Power Query cleans and merges the supplier Excel register, ERP purchase orders and the inspection log. DAX measures cover the weighted score, days-to-expiry buckets and documentation completeness. A scheduled refresh plus a data-driven subscription emails the exceptions list every Monday.</p>
-    </div>
+    <aside class="fp" aria-label="Filters">
+      <h4>Filters <span style="color:var(--ink3);font-weight:400">⌄</span></h4>
+      <div class="fc"><div class="t">Supplier type <a id="clrType">Clear</a></div><div id="fType"></div></div>
+      <div class="fc"><div class="t">Tier <a id="clrTier">Clear</a></div><div id="fTier"></div></div>
+      <div class="fc"><div class="t">Country</div><div class="is" id="fCtry">is (All)</div></div>
+      <div class="fc"><div class="t">Certificate status</div><div class="is" id="fStat">is (All)</div></div>
+    </aside>
+  </div>
+  <div class="tabs" role="tablist">
+    <button class="tab on" data-p="0">Overview</button><button class="tab" data-p="1">Supplier Scorecard</button><button class="tab" data-p="2">Certification Expiry</button><button class="tab" data-p="3">Traceability</button>
   </div>
 </div>
-<footer>Built by Ahmad Anis · supply chain analytics & BI · <a href="https://ahmadanis3620-hue.github.io/automation-portfolio/">More work</a></footer>
-</div>
+<div class="tip" id="tip"></div>
 <script>
 (()=>{
-const TODAY=new Date('2026-11-17T00:00:00');
-const days=s=>Math.round((new Date(s+'T00:00:00')-TODAY)/864e5);
-const nice=s=>new Date(s+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
-const TYPES=['Fabric mill','Trim supplier','Cut & sew factory','Dye house'];
-const CERTS=['GOTS','OEKO-TEX 100','BSCI','GRS','WRAP'];
-// mock suppliers
+const T0=new Date('2026-11-17T00:00:00'),D=s=>Math.round((new Date(s+'T00:00:00')-T0)/864e5);
+const md=s=>{const d=new Date(s+'T00:00:00');return (d.getMonth()+1)+'/'+d.getDate()+'/'+String(d.getFullYear()).slice(2)};
+const C={ok:'#1AAB40',warn:'#D9B300',bad:'#D64550',soon:'#E66C37',p:['#118DFF','#12239E','#E66C37','#6B007B','#E044A7','#744EC2']};
+// name, type, tier, country, docs, insp, otd, spend $K, certs [name, issued, expiry|null]
 const S=[
- ['Anatolia Textiles','Fabric mill','Türkiye',96,98,95],['Coastline Knits','Fabric mill','Portugal',92,90,97],['Indus Cotton Mills','Fabric mill','Pakistan',81,85,88],['Saigon Weave Co.','Fabric mill','Vietnam',74,80,83],
- ['Button & Bar Trims','Trim supplier','China',88,92,94],['Zipline Components','Trim supplier','India',63,70,76],['LabelWorks','Trim supplier','Bangladesh',90,95,91],
- ['Dhaka Apparel Group','Cut & sew factory','Bangladesh',78,84,80],['Pacific Sewing Ltd.','Cut & sew factory','Vietnam',94,96,93],['Lima Garment Works','Cut & sew factory','Peru',86,88,92],['Northern Stitch','Cut & sew factory','Guatemala',58,66,71],
- ['Colorfast Dyeing','Dye house','India',83,79,89],['Blue River Dye','Dye house','China',69,74,85],
-];
-const CERTREC={ // supplier -> [cert, expiry or null(missing doc)]
- 'Anatolia Textiles':[['GOTS','2027-06-30'],['OEKO-TEX 100','2027-02-14']],'Coastline Knits':[['GRS','2026-12-05'],['OEKO-TEX 100','2027-08-01']],
- 'Indus Cotton Mills':[['GOTS','2026-12-28'],['BSCI','2027-03-11']],'Saigon Weave Co.':[['OEKO-TEX 100','2026-11-02'],['BSCI',null]],
- 'Button & Bar Trims':[['OEKO-TEX 100','2027-05-20']],'Zipline Components':[['OEKO-TEX 100','2026-10-15'],['BSCI',null]],'LabelWorks':[['OEKO-TEX 100','2027-01-09'],['GRS','2027-04-22']],
- 'Dhaka Apparel Group':[['WRAP','2027-01-30'],['BSCI','2026-12-12']],'Pacific Sewing Ltd.':[['WRAP','2027-09-10'],['BSCI','2027-07-01']],'Lima Garment Works':[['WRAP','2027-02-02'],['GOTS','2027-03-15']],
- 'Northern Stitch':[['WRAP','2026-09-30'],['BSCI',null]],'Colorfast Dyeing':[['OEKO-TEX 100','2026-12-20'],['GOTS','2027-05-05']],'Blue River Dye':[['OEKO-TEX 100','2027-01-25'],['BSCI','2026-11-29']],
-};
-const INSPFAIL={'Northern Stitch':'Final AQL 2.5 failed (stitching defects), Nov 3','Zipline Components':'Nickel test failed on YKK-alt zipper lot, Oct 29','Blue River Dye':'Wastewater audit finding open, Oct 18'};
-const certStatus=e=>e===null?'Missing document':days(e)<0?'Expired':days(e)<=30?'Expires ≤30d':days(e)<=60?'Expires 31–60d':days(e)<=90?'Expires 61–90d':'Valid';
-const STATUS_COLOR={'Valid':'var(--good)','Expires 61–90d':'var(--accent)','Expires 31–60d':'var(--warning)','Expires ≤30d':'var(--serious)','Expired':'var(--critical)','Missing document':'var(--critical)'};
-const rows=S.map(([name,type,country,docs,insp,otd])=>{const cr=CERTREC[name];const certScore=cr.filter(c=>c[1]&&days(c[1])>=0).length/cr.length*100;const score=Math.round(certScore*.35+docs*.25+insp*.25+otd*.15);const bad=cr.some(c=>c[1]===null||days(c[1])<0)||INSPFAIL[name];const watch=cr.some(c=>c[1]&&days(c[1])>=0&&days(c[1])<=60);const risk=bad||score<70?'High':watch||score<85?'Medium':'Low';return{name,type,country,docs,insp,otd,score,risk,certs:cr}});
-const RISKC={High:'var(--critical)',Medium:'var(--warning)',Low:'var(--good)'};
+['Anatolia Textiles','Fabric mill',2,'Türkiye',98,95,97,412,[['GOTS','2025-07-01','2027-06-30'],['OEKO-TEX 100','2026-02-15','2027-02-14']]],
+['Coastline Knits','Fabric mill',2,'Portugal',92,97,95,298,[['GRS','2025-12-06','2026-12-05'],['OEKO-TEX 100','2026-08-02','2027-08-01']]],
+['Indus Cotton Mills','Fabric mill',2,'Pakistan',85,88,90,520,[['GOTS','2025-12-29','2026-12-28'],['BSCI','2025-03-12','2027-03-11']]],
+['Saigon Weave Co.','Fabric mill',2,'Vietnam',74,83,86,187,[['OEKO-TEX 100','2025-11-03','2026-11-02'],['BSCI','',null]]],
+['Button & Bar Trims','Trim supplier',3,'China',92,94,91,96,[['OEKO-TEX 100','2026-05-21','2027-05-20']]],
+['Zipline Components','Trim supplier',3,'India',70,64,78,134,[['OEKO-TEX 100','2025-10-16','2026-10-15'],['BSCI','',null]]],
+['LabelWorks','Trim supplier',3,'Bangladesh',95,91,96,58,[['OEKO-TEX 100','2026-01-10','2027-01-09'],['GRS','2026-04-23','2027-04-22']]],
+['Dhaka Apparel Group','Cut & sew',1,'Bangladesh',84,80,82,860,[['WRAP','2026-01-31','2027-01-30'],['BSCI','2025-12-13','2026-12-12']]],
+['Pacific Sewing Ltd.','Cut & sew',1,'Vietnam',96,93,95,1040,[['WRAP','2026-09-11','2027-09-10'],['BSCI','2026-07-02','2027-07-01']]],
+['Lima Garment Works','Cut & sew',1,'Peru',88,92,89,640,[['WRAP','2026-02-03','2027-02-02'],['GOTS','2026-03-16','2027-03-15']]],
+['Northern Stitch','Cut & sew',1,'Guatemala',66,58,71,455,[['WRAP','2025-10-01','2026-09-30'],['BSCI','',null]]],
+['Colorfast Dyeing','Dye house',2,'India',79,89,88,210,[['OEKO-TEX 100','2025-12-21','2026-12-20'],['GOTS','2026-05-06','2027-05-05']]],
+['Blue River Dye','Dye house',2,'China',74,69,85,166,[['OEKO-TEX 100','2026-01-26','2027-01-25'],['BSCI','2025-11-30','2026-11-29']]],
+].map(([name,type,tier,country,docs,insp,otd,spend,certs])=>{const valid=certs.filter(c=>c[2]&&D(c[2])>=0).length;const cert=Math.round(valid/certs.length*100);const score=Math.round(cert*.35+docs*.25+insp*.25+otd*.15);return{name,type,tier,country,docs,insp,otd,spend,certs,cert,score}});
+const FIND={'Northern Stitch':['Final AQL 2.5 failed: stitching defects','R. Alvarez',14],'Zipline Components':['Nickel release test failed, zipper lot ZC-901','P. Shah',19],'Blue River Dye':['Wastewater audit finding unresolved','L. Chen',30]};
+const stOf=e=>e===null?'Missing':D(e)<0?'Expired':D(e)<=60?'Expiring ≤60d':'Valid';
+const ST=['Valid','Expiring ≤60d','Expired','Missing'],STC={'Valid':C.ok,'Expiring ≤60d':C.warn,'Expired':C.bad,'Missing':'#8A1F2B'};
+const TYPES=['Fabric mill','Trim supplier','Cut & sew','Dye house'];
+const F={type:new Set(TYPES),tier:new Set([1,2,3]),ctry:null,stat:null,sort:'score',dir:1};
+const tip=document.getElementById('tip');
+const showTip=(e,h)=>{tip.innerHTML=h;tip.style.display='block';tip.style.left=Math.min(e.clientX+12,innerWidth-270)+'px';tip.style.top=(e.clientY+12)+'px'};const hideTip=()=>tip.style.display='none';
+const rows=()=>S.filter(s=>F.type.has(s.type)&&F.tier.has(s.tier)&&(!F.ctry||s.country===F.ctry)&&(!F.stat||s.certs.some(c=>stOf(c[2])===F.stat)));
+const hmc=v=>v>=90?['#C6EFCE','#006100']:v>=75?['#FFEB9C','#7A5C00']:['#FFC7CE','#9C0006'];
+const svgEl=(w,h,inner)=>`<svg viewBox="0 0 ${w} ${h}" width="100%" style="display:block;max-height:${h+20}px">${inner}</svg>`;
+
+function kpis(R){
+  const certs=R.flatMap(s=>s.certs);const exp=certs.filter(c=>['Expired','Missing'].includes(stOf(c[2]))).length;const soon=certs.filter(c=>stOf(c[2])==='Expiring ≤60d').length;
+  const avg=R.length?(R.reduce((a,s)=>a+s.score*s.spend,0)/R.reduce((a,s)=>a+s.spend,0)):0;
+  const risk=R.filter(s=>s.score<75).reduce((a,s)=>a+s.spend,0);const open=R.filter(s=>FIND[s.name]).length;
+  const k=[['Active suppliers',R.length,'',''],['Spend-weighted score',avg.toFixed(1),'▲ 2.4 vs last quarter',C.ok],['Expired or missing certificates',exp,'blocks new POs',C.bad],['Expiring within 60 days',soon,'renewals requested',C.warn],['Spend with suppliers < 75',`$${(risk/1000).toFixed(2)}M`,`${open} open audit findings`,C.bad]];
+  document.getElementById('kpis').innerHTML=k.map(x=>`<div class="v"><div class="n">${x[1]}</div><div class="l">${x[0]}</div>${x[2]?`<div class="d" style="color:${x[3]}">${x[2]}</div>`:''}</div>`).join('');
+}
+function donut(R){
+  const cnt=ST.map(s=>[s,R.flatMap(r=>r.certs).filter(c=>stOf(c[2])===s).length]);const tot=cnt.reduce((a,c)=>a+c[1],0)||1;
+  let a0=-Math.PI/2,paths='';const cx=110,cy=95,r=78,ri=48;
+  cnt.forEach(([s,n])=>{if(!n)return;const a1=a0+n/tot*2*Math.PI;const L=a1-a0>Math.PI?1:0;const p=(a,rr)=>[cx+rr*Math.cos(a),cy+rr*Math.sin(a)];const[x0,y0]=p(a0,r),[x1,y1]=p(a1,r),[x2,y2]=p(a1,ri),[x3,y3]=p(a0,ri);
+    paths+=`<path data-s="${s}" d="M${x0},${y0}A${r},${r} 0 ${L} 1 ${x1},${y1}L${x2},${y2}A${ri},${ri} 0 ${L} 0 ${x3},${y3}Z" fill="${STC[s]}" stroke="#fff" stroke-width="2" opacity="${F.stat&&F.stat!==s?.3:1}" style="cursor:pointer"/>`;a0=a1});
+  const leg=cnt.map(([s,n],i)=>`<g transform="translate(215,${45+i*24})" data-s="${s}" style="cursor:pointer"><rect width="10" height="10" rx="5" fill="${STC[s]}"/><text x="16" y="9" font-size="11" fill="#252423">${s}</text><text x="125" y="9" font-size="11" fill="#605E5C" text-anchor="end">${n} (${Math.round(n/tot*100)}%)</text></g>`).join('');
+  const el=document.getElementById('donut');el.innerHTML=svgEl(345,190,paths+`<text x="${cx}" y="${cy-2}" text-anchor="middle" font-size="22" font-weight="300">${tot}</text><text x="${cx}" y="${cy+15}" text-anchor="middle" font-size="10" fill="#605E5C">certificates</text>`+leg);
+  el.querySelectorAll('[data-s]').forEach(p=>{const s=p.dataset.s;p.onclick=()=>{F.stat=F.stat===s?null:s;render()};p.onmousemove=e=>showTip(e,`<b>${s}</b><br>${cnt.find(c=>c[0]===s)[1]} certificates`);p.onmouseleave=hideTip});
+}
+function ctry(R){
+  const all=[...new Set(S.filter(s=>F.type.has(s.type)&&F.tier.has(s.tier)).map(s=>s.country))];
+  const d=all.map(c=>{const x=S.filter(s=>s.country===c&&F.type.has(s.type)&&F.tier.has(s.tier));return[c,x.reduce((a,s)=>a+s.score,0)/x.length,x.length]}).sort((a,b)=>b[1]-a[1]);
+  const W=330,rh=22,H=d.length*rh+20,L=80;let g=`<line x1="${L}" x2="${L}" y1="0" y2="${H-18}" stroke="#c8c6c4"/>`;
+  [0,25,50,75,100].forEach(v=>{const x=L+v/100*(W-L-34);g+=`<text x="${x}" y="${H-4}" font-size="10" fill="#8A8886" text-anchor="middle">${v}</text>`});
+  d.forEach(([c,v,n],i)=>{const y=i*rh+3,w=v/100*(W-L-34);const col=v>=90?C.ok:v>=75?C.p[0]:C.bad;g+=`<g data-c="${c}" style="cursor:pointer" opacity="${F.ctry&&F.ctry!==c?.3:1}"><text x="${L-6}" y="${y+12}" font-size="11" text-anchor="end" fill="#252423">${c}</text><rect x="${L}" y="${y}" width="${w}" height="${rh-6}" fill="${col}"/><text x="${L+w+4}" y="${y+12}" font-size="10" fill="#605E5C">${v.toFixed(0)}</text></g>`});
+  const el=document.getElementById('ctry');el.innerHTML=svgEl(W,H,g);
+  el.querySelectorAll('[data-c]').forEach(b=>{const c=b.dataset.c;b.onclick=()=>{F.ctry=F.ctry===c?null:c;render()};b.onmousemove=e=>{const r=d.find(x=>x[0]===c);showTip(e,`<b>${c}</b><br>Avg score: ${r[1].toFixed(1)}<br>Suppliers: ${r[2]}`)};b.onmouseleave=hideTip});
+}
+function trend(R){
+  const base=R.length?R.reduce((a,s)=>a+s.score,0)/R.length:0;const m=['Dec','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov'];
+  const sc=m.map((_,i)=>+(base-6+i*0.55+Math.sin(i*1.3)*1.4).toFixed(1));const fi=m.map((_,i)=>Math.max(0,Math.round(R.length*0.55-i*0.28+(i%3===0?2:0))));
+  const W=420,H=190,l=30,r=30,t=8,b=22,iw=W-l-r,ih=H-t-b;const x=i=>l+i/11*iw;const ys=v=>t+ih-(v-50)/50*ih;const mf=Math.ceil(Math.max(4,...fi)/5)*5*2;const yf=v=>t+ih-v/mf*ih;
+  let g='';[50,60,70,80,90,100].forEach((v,j)=>g+=`<line x1="${l}" x2="${W-r}" y1="${ys(v)}" y2="${ys(v)}" stroke="#EDEBE9"/><text x="${l-4}" y="${ys(v)+3}" font-size="10" fill="#8A8886" text-anchor="end">${v}</text><text x="${W-r+4}" y="${ys(v)+3}" font-size="10" fill="#8A8886">${Math.round(j/5*mf)}</text>`);
+  fi.forEach((v,i)=>g+=`<rect x="${x(i)-7}" y="${yf(v)}" width="14" height="${t+ih-yf(v)}" fill="#E66C37" opacity=".85"/>`);
+  g+=`<path d="${sc.map((v,i)=>(i?'L':'M')+x(i)+','+ys(v)).join('')}" fill="none" stroke="#118DFF" stroke-width="2.5"/>`;
+  sc.forEach((v,i)=>g+=`<circle cx="${x(i)}" cy="${ys(v)}" r="3" fill="#118DFF"/>`);
+  m.forEach((s,i)=>{if(i%2===0)g+=`<text x="${x(i)}" y="${H-6}" font-size="10" fill="#8A8886" text-anchor="middle">${s}</text>`});
+  g+=`<rect class="hit" x="${l}" y="${t}" width="${iw}" height="${ih}" fill="transparent"/>`;
+  const el=document.getElementById('trend');el.innerHTML=svgEl(W,H,g);
+  el.querySelector('.hit').onmousemove=e=>{const bb=e.target.getBoundingClientRect();const i=Math.max(0,Math.min(11,Math.round((e.clientX-bb.left)/bb.width*11)));showTip(e,`<b>${m[i]} ${i===0?'2025':'2026'}</b><br>Avg score: ${sc[i]}<br>Open findings: ${fi[i]}`)};el.querySelector('.hit').onmouseleave=hideTip;
+}
+function spend(R){
+  const d=TYPES.map(t=>{const x=R.filter(s=>s.type===t);return[t,x.filter(s=>s.score>=75).reduce((a,s)=>a+s.spend,0),x.filter(s=>s.score<75).reduce((a,s)=>a+s.spend,0)]});
+  const mx=Math.max(1,...d.map(v=>v[1]+v[2]));const W=330,rh=34,L=90,H=d.length*rh+24;let g='';
+  d.forEach(([t,a,b],i)=>{const y=i*rh+4,wa=a/mx*(W-L-50),wb=b/mx*(W-L-50);g+=`<text x="${L-6}" y="${y+15}" font-size="11" text-anchor="end">${t}</text><rect x="${L}" y="${y}" width="${wa}" height="22" fill="#118DFF"/><rect x="${L+wa}" y="${y}" width="${wb}" height="22" fill="#D64550"/><text x="${L+wa+wb+4}" y="${y+15}" font-size="10" fill="#605E5C">$${(a+b).toLocaleString()}K</text>`});
+  g+=`<g transform="translate(${L},${H-10})"><rect width="9" height="9" fill="#118DFF"/><text x="13" y="8" font-size="10" fill="#605E5C">Score ≥ 75</text><rect x="85" width="9" height="9" fill="#D64550"/><text x="98" y="8" font-size="10" fill="#605E5C">Score &lt; 75 (at risk)</text></g>`;
+  document.getElementById('spend').innerHTML=svgEl(W,H,g);
+}
+function exc(R){
+  const ex=[];R.forEach(s=>{s.certs.forEach(c=>{const st=stOf(c[2]);if(st==='Missing')ex.push([s.name,`${c[0]} certificate not on file`,'Sourcing ops',99,C.bad]);else if(st==='Expired')ex.push([s.name,`${c[0]} expired ${md(c[2])}`,'Sourcing ops',-D(c[2]),C.bad]);else if(st==='Expiring ≤60d')ex.push([s.name,`${c[0]} expires ${md(c[2])}`,'Buyer',D(c[2]),C.warn])});if(FIND[s.name])ex.push([s.name,FIND[s.name][0],FIND[s.name][1],FIND[s.name][2],C.bad])});
+  ex.sort((a,b)=>(a[4]===C.bad?0:1)-(b[4]===C.bad?0:1)||b[3]-a[3]);
+  document.querySelector('#exc tbody').innerHTML=ex.map(e=>`<tr><td>${e[0]}</td><td><svg width="9" height="9" style="vertical-align:-1px;margin-right:5px"><circle cx="4.5" cy="4.5" r="4.5" fill="${e[4]}"/></svg>${e[1]}</td><td>${e[2]}</td><td class="n">${e[3]===99?'—':e[3]}</td></tr>`).join('')||'<tr><td colspan="4">No exceptions in the current filter.</td></tr>';
+}
+function score(R){
+  const s=[...R].sort((a,b)=>{const k=F.sort;return(typeof a[k]==='string'?a[k].localeCompare(b[k]):b[k]-a[k])*F.dir});
+  const cell=v=>{const[bg,fg]=hmc(v);return `<td class="n" style="background:${bg};color:${fg};font-weight:600">${v}</td>`};
+  document.querySelector('#score tbody').innerHTML=s.map(r=>`<tr><td>${r.name}</td><td>Tier ${r.tier}</td><td>${r.type}</td><td>${r.country}</td>${cell(r.cert)}${cell(r.docs)}${cell(r.insp)}${cell(r.otd)}${cell(r.score)}<td class="n">${r.spend.toLocaleString()}</td></tr>`).join('')+`<tr style="font-weight:600"><td>Total</td><td></td><td></td><td></td><td class="n">${avg(R,'cert')}</td><td class="n">${avg(R,'docs')}</td><td class="n">${avg(R,'insp')}</td><td class="n">${avg(R,'otd')}</td><td class="n">${avg(R,'score')}</td><td class="n">${R.reduce((a,x)=>a+x.spend,0).toLocaleString()}</td></tr>`;
+}
+const avg=(R,k)=>R.length?Math.round(R.reduce((a,x)=>a+x[k],0)/R.length):0;
+function gantt(R){
+  const start=new Date('2025-07-01T00:00:00'),end=new Date('2027-10-01T00:00:00');const span=end-start;
+  const items=R.flatMap(s=>s.certs.map(c=>({s:s.name,c:c[0],i:c[1],e:c[2]})));const W=1100,L=250,rh=20,H=items.length*rh+40,iw=W-L-20;const x=d=>L+(new Date(d+'T00:00:00')-start)/span*iw;
+  let g='';for(let y=2025;y<=2027;y++)for(let q=0;q<12;q+=3){const d=`${y}-${String(q+1).padStart(2,'0')}-01`;const xx=x(d);if(xx<L||xx>W-20)continue;g+=`<line x1="${xx}" x2="${xx}" y1="0" y2="${H-24}" stroke="#EDEBE9"/><text x="${xx}" y="${H-8}" font-size="10" fill="#8A8886" text-anchor="middle">${['Jan','Apr','Jul','Oct'][q/3]} ${String(y).slice(2)}</text>`}
+  const tx=x('2026-11-17');g+=`<line x1="${tx}" x2="${tx}" y1="0" y2="${H-24}" stroke="#252423" stroke-dasharray="4 3"/><text x="${tx+4}" y="10" font-size="10" fill="#252423">Today</text>`;
+  items.forEach((it,k)=>{const y=k*rh+14;const st=stOf(it.e);const col=st==='Valid'?C.ok:st==='Expiring ≤60d'?C.warn:C.bad;g+=`<text x="${L-8}" y="${y+10}" font-size="11" text-anchor="end" fill="#252423">${it.s} · ${it.c}</text>`;
+    if(it.e){g+=`<rect class="gb" data-k="${k}" x="${x(it.i)}" y="${y}" width="${Math.max(2,x(it.e)-x(it.i))}" height="13" fill="${col}"/>`}else{g+=`<text x="${L+4}" y="${y+10}" font-size="11" fill="${C.bad}" font-weight="600">No certificate on file</text>`}});
+  const el=document.getElementById('gantt');el.innerHTML=svgEl(W,H,g);
+  el.querySelectorAll('.gb').forEach(b=>{const it=items[b.dataset.k];b.onmousemove=e=>showTip(e,`<b>${it.s}</b><br>${it.c}<br>Issued ${md(it.i)} · Expires ${md(it.e)}<br>${D(it.e)<0?`Expired ${-D(it.e)} days ago`:`${D(it.e)} days remaining`}`);b.onmouseleave=hideTip});
+}
 const LOTS=[
- {lot:'FG-24117 · Organic Crew Tee (Navy)',chain:[['Fiber','Organic cotton, Sindh','GOTS TC-88412'],['Spinning / fabric','Indus Cotton Mills','Lot IC-5531 · GOTS exp Dec 28, 2026'],['Dyeing','Colorfast Dyeing','Batch CD-0912 · OEKO-TEX exp Dec 20, 2026'],['Trims','LabelWorks','Care labels LW-221'],['Cut & sew','Dhaka Apparel Group','PO 45-1180 · WRAP valid'],['Finished goods','DC Columbus','Received Oct 30, 2026']]},
- {lot:'FG-24131 · Recycled Fleece Hoodie',chain:[['Fiber','rPET flake, Izmir','GRS TC-77120'],['Spinning / fabric','Anatolia Textiles','Lot AT-3302 · GOTS/OEKO valid'],['Dyeing','Anatolia Textiles (in-house)','Batch AT-D118'],['Trims','Zipline Components','Zipper ZC-901 · ⚠ OEKO-TEX expired'],['Cut & sew','Pacific Sewing Ltd.','PO 45-1204 · WRAP valid'],['Finished goods','DC Columbus','In transit, ETA Nov 24']]},
- {lot:'FG-24152 · Merino Base Layer',chain:[['Fiber','Merino wool, NZ','RWS TC-30155'],['Spinning / fabric','Coastline Knits','Lot CK-7710 · GRS exp Dec 5, 2026'],['Dyeing','Blue River Dye','Batch BR-4402 · ⚠ audit finding open'],['Trims','Button & Bar Trims','Thread BB-118'],['Cut & sew','Northern Stitch','PO 45-1219 · ⚠ final inspection failed'],['Finished goods','Hold at factory','Pending re-inspection']]},
-];
-const $=id=>document.getElementById(id);
-const state={types:new Set(TYPES),country:'',cert:'',risks:new Set(['High','Medium','Low']),sort:'score',dir:1,sel:null};
-$('fType').innerHTML=TYPES.map(t=>`<label><input type="checkbox" checked value="${t}">${t}</label>`).join('');
-$('fRisk').innerHTML=['High','Medium','Low'].map(r=>`<label><input type="checkbox" checked value="${r}"><span class="dot" style="background:${RISKC[r]}"></span>${r}</label>`).join('');
-$('fCountry').innerHTML+=[...new Set(S.map(s=>s[2]))].sort().map(c=>`<option>${c}</option>`).join('');
-$('fCert').innerHTML+=CERTS.map(c=>`<option>${c}</option>`).join('');
-$('lotSel').innerHTML=LOTS.map((l,i)=>`<option value="${i}">${l.lot}</option>`).join('');
-const filt=()=>rows.filter(r=>state.types.has(r.type)&&(!state.country||r.country===state.country)&&(!state.cert||r.certs.some(c=>c[0]===state.cert))&&state.risks.has(r.risk));
-function bars(el,data,max,color){el.innerHTML=data.map(([k,v,c])=>`<div class="bar"><span>${k}</span><div class="t"><i style="width:${max?v/max*100:0}%;background:${c||color}"></i></div><span class="n">${v}</span></div>`).join('')}
-function render(){
-  const R=filt();const allCerts=R.flatMap(r=>r.certs.map(c=>({s:r.name,c:c[0],e:c[1],st:certStatus(c[1])})).filter(x=>!state.cert||x.c===state.cert));
-  const avg=R.length?Math.round(R.reduce((a,r)=>a+r.score,0)/R.length):0;
-  const exp=allCerts.filter(c=>c.st==='Expired').length,soon=allCerts.filter(c=>/Expires ≤30|31–60/.test(c.st)).length,miss=allCerts.filter(c=>c.st==='Missing document').length;
-  $('tiles').innerHTML=[['Suppliers in view',R.length,'of '+rows.length+' active'],['Avg compliance score',avg,'weighted 0–100'],['Expired certifications',exp,'block new POs'],['Expiring in 60 days',soon,'renewal reminders sent'],['Missing documents',miss,'request from supplier']].map(t=>`<div class="tile"><div class="l">${t[0]}</div><div class="v">${t[1]}</div><div class="n">${t[2]}</div></div>`).join('');
-  const order=['Valid','Expires 61–90d','Expires 31–60d','Expires ≤30d','Expired','Missing document'];
-  const cnt=order.map(o=>[o,allCerts.filter(c=>c.st===o).length,STATUS_COLOR[o]]);bars($('certBars'),cnt,Math.max(1,...cnt.map(c=>c[1])));
-  const tb=TYPES.map(t=>{const x=R.filter(r=>r.type===t);return[t,x.length?Math.round(x.reduce((a,r)=>a+r.score,0)/x.length):0]});bars($('typeBars'),tb,100,'var(--bar)');
-  const sorted=[...R].sort((a,b)=>{const k=state.sort;return(typeof a[k]==='string'?a[k].localeCompare(b[k]):a[k]-b[k])*state.dir});
-  const m=v=>`<span class="meter"><i style="width:${v}%;background:${v>=85?'var(--good)':v>=70?'var(--warning)':'var(--critical)'}"></i></span>${v}%`;
-  document.querySelector('#sc tbody').innerHTML=sorted.map(r=>`<tr data-n="${r.name}" class="${state.sel===r.name?'sel':''}"><td><b>${r.name}</b></td><td>${r.type}</td><td>${r.country}</td><td class="num"><b>${r.score}</b></td><td class="num">${m(r.docs)}</td><td class="num">${m(r.insp)}</td><td class="num">${m(r.otd)}</td><td><span class="chip"><span class="dot" style="background:${RISKC[r.risk]}"></span>${r.risk}</span></td></tr>`).join('');
-  const ex=[];R.forEach(r=>{r.certs.forEach(c=>{const st=certStatus(c[1]);if(st==='Missing document')ex.push([r.name,`${c[0]} certificate not on file`,'Missing',0]);else if(st==='Expired')ex.push([r.name,`${c[0]} expired`,nice(c[1]),1]);else if(st==='Expires ≤30d')ex.push([r.name,`${c[0]} expires in ${days(c[1])} days`,nice(c[1]),2])});if(INSPFAIL[r.name])ex.push([r.name,INSPFAIL[r.name].split(',')[0],INSPFAIL[r.name].split(', ')[1]||'',0])});
-  ex.sort((a,b)=>a[3]-b[3]);$('#ex'.slice(1))?null:0;document.querySelector('#ex tbody').innerHTML=ex.map(e=>`<tr data-n="${e[0]}"><td><b>${e[0]}</b></td><td><span class="chip"><span class="dot" style="background:${e[3]<2?'var(--critical)':'var(--serious)'}"></span>${e[1]}</span></td><td>${e[2]}</td></tr>`).join('')||'<tr><td colspan="3">No exceptions for this filter 🎉</td></tr>';
-  detail();
+ {id:'FG-24117',name:'Organic Crew Tee, Navy',chain:[['Fiber','Organic cotton, Sindh','GOTS TC-88412',1],['Mill','Indus Cotton Mills','Lot IC-5531',1],['Dye house','Colorfast Dyeing','Batch CD-0912',1],['Trims','LabelWorks','Care label LW-221',1],['Cut & sew','Dhaka Apparel Group','PO 45-1180',1],['DC','Columbus DC','Received 10/30/26',1]]},
+ {id:'FG-24131',name:'Recycled Fleece Hoodie',chain:[['Fiber','rPET flake, Izmir','GRS TC-77120',1],['Mill','Anatolia Textiles','Lot AT-3302',1],['Dye house','Anatolia Textiles','Batch AT-D118',1],['Trims','Zipline Components','Zipper ZC-901 · OEKO-TEX expired',0],['Cut & sew','Pacific Sewing Ltd.','PO 45-1204',1],['DC','In transit','ETA 11/24/26',1]]},
+ {id:'FG-24152',name:'Merino Base Layer',chain:[['Fiber','Merino wool, NZ','RWS TC-30155',1],['Mill','Coastline Knits','Lot CK-7710',1],['Dye house','Blue River Dye','Batch BR-4402 · audit finding open',0],['Trims','Button & Bar Trims','Thread BB-118',1],['Cut & sew','Northern Stitch','PO 45-1219 · AQL failed',0],['DC','On hold at factory','Pending re-inspection',0]]},
+];let lot=0;
+function flow(){
+  document.getElementById('lots').innerHTML=LOTS.map((l,i)=>`<button class="${i===lot?'on':''}" data-i="${i}">${l.id} · ${l.name}</button>`).join('');
+  document.querySelectorAll('#lots button').forEach(b=>b.onclick=()=>{lot=+b.dataset.i;flow()});
+  const ch=LOTS[lot].chain;const W=1100,H=170,n=ch.length,bw=150,gap=(W-n*bw)/(n-1);let g='';
+  ch.forEach((c,i)=>{const x=i*(bw+gap),ok=c[3];if(i){const px=x-gap;g+=`<path d="M${px},${H/2} C${px+gap/2},${H/2} ${x-gap/2},${H/2} ${x},${H/2}" stroke="${ok&&ch[i-1][3]?'#118DFF':'#D64550'}" stroke-width="${ok&&ch[i-1][3]?6:6}" fill="none" opacity=".5"/>`}
+    g+=`<g><rect x="${x}" y="${H/2-48}" width="${bw}" height="96" fill="#fff" stroke="${ok?'#c8c6c4':'#D64550'}" stroke-width="${ok?1:2}"/><rect x="${x}" y="${H/2-48}" width="${bw}" height="4" fill="${ok?'#118DFF':'#D64550'}"/><text x="${x+10}" y="${H/2-26}" font-size="10" fill="#8A8886" letter-spacing=".5">${c[0].toUpperCase()}</text><text x="${x+10}" y="${H/2-8}" font-size="12" font-weight="600" fill="#252423">${c[1].length>22?c[1].slice(0,21)+'…':c[1]}</text>${wrap(c[2],x+10,H/2+10,ok)}</g>`});
+  document.getElementById('flow').innerHTML=svgEl(W,H,g);
+  const bad=ch.filter(c=>!c[3]);document.getElementById('flownote').innerHTML=bad.length?`<b style="color:#D64550">${bad.length} broken link${bad.length>1?'s':''}:</b> ${bad.map(c=>c[1]+' ('+c[2].split(' · ')[1]+')').join('; ')}. Lot cannot be released until resolved.`:'<b style="color:#1AAB40">Full chain documented.</b> Every step has a supporting certificate or record.';
 }
-function detail(){
-  const r=rows.find(x=>x.name===state.sel);if(!r){$('detTitle').textContent='Supplier detail';$('det').innerHTML='';$('detHint').textContent='Select a supplier in the scorecard or exceptions list.';return}
-  $('detTitle').textContent=r.name;$('detHint').textContent=`${r.type} · ${r.country} · score ${r.score} · ${r.risk} risk`;
-  const lots=LOTS.filter(l=>l.chain.some(c=>c[1].startsWith(r.name)));
-  $('det').innerHTML=`<table><thead><tr><th>Certification</th><th>Expiry</th><th>Status</th></tr></thead><tbody>${r.certs.map(c=>{const st=certStatus(c[1]);return `<tr><td>${c[0]}</td><td>${c[1]?nice(c[1]):'—'}</td><td><span class="chip"><span class="dot" style="background:${STATUS_COLOR[st]}"></span>${st}</span></td></tr>`}).join('')}</tbody></table>${INSPFAIL[r.name]?`<p style="margin:8px 0 0"><b>Open issue:</b> ${INSPFAIL[r.name]}</p>`:''}<p style="margin:8px 0 0"><b>Lots using this supplier:</b> ${lots.length?lots.map(l=>l.lot.split(' · ')[0]).join(', '):'none in view'}</p>`;
+function wrap(t,x,y,ok){const w=t.split(' ');let lines=[''];w.forEach(s=>{if((lines[lines.length-1]+' '+s).trim().length>24)lines.push(s);else lines[lines.length-1]=(lines[lines.length-1]+' '+s).trim()});return lines.slice(0,3).map((l,i)=>`<text x="${x}" y="${y+i*14}" font-size="11" fill="${ok?'#605E5C':'#D64550'}">${l}</text>`).join('')}
+function filters(){
+  document.getElementById('fType').innerHTML=TYPES.map(t=>`<label><input type="checkbox" ${F.type.has(t)?'checked':''} value="${t}">${t}</label>`).join('');
+  document.getElementById('fTier').innerHTML=[1,2,3].map(t=>`<label><input type="checkbox" ${F.tier.has(t)?'checked':''} value="${t}">Tier ${t}</label>`).join('');
+  document.getElementById('fCtry').textContent=F.ctry?`is ${F.ctry}`:'is (All)';document.getElementById('fStat').textContent=F.stat?`is ${F.stat}`:'is (All)';
 }
-function trace(){const l=LOTS[$('lotSel').value];$('trace').innerHTML=l.chain.map((c,i)=>`${i?'<span class="arrow">→</span>':''}<div class="node" style="${/⚠/.test(c[2])?'border-color:var(--critical)':''}"><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="s">${c[2]}</div></div>`).join('')}
-$('fType').onchange=e=>{e.target.checked?state.types.add(e.target.value):state.types.delete(e.target.value);render()};
-$('fRisk').onchange=e=>{e.target.checked?state.risks.add(e.target.value):state.risks.delete(e.target.value);render()};
-$('fCountry').onchange=e=>{state.country=e.target.value;render()};$('fCert').onchange=e=>{state.cert=e.target.value;render()};
-$('reset').onclick=()=>{state.types=new Set(TYPES);state.risks=new Set(['High','Medium','Low']);state.country='';state.cert='';document.querySelectorAll('.slicers input').forEach(i=>i.checked=true);$('fCountry').value='';$('fCert').value='';render()};
-document.querySelector('#sc thead').onclick=e=>{const k=e.target.dataset.k;if(!k)return;state.dir=state.sort===k?-state.dir:(k==='score'?1:1);state.sort=k;render()};
-document.addEventListener('click',e=>{const tr=e.target.closest('#sc tbody tr, #ex tbody tr');if(tr&&tr.dataset.n){state.sel=tr.dataset.n;render()}});
-$('lotSel').onchange=trace;
-$('themeBtn').onclick=()=>{const r=document.documentElement;const d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=d?'light':'dark';try{localStorage.setItem('theme',r.dataset.theme)}catch(e){}};
-try{const t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
-state.sel='Northern Stitch';render();trace();
+function render(){const R=rows();kpis(R);donut(R);ctry(R);trend(R);spend(R);exc(R);score(R);gantt(R);filters()}
+document.getElementById('fType').onchange=e=>{e.target.checked?F.type.add(e.target.value):F.type.delete(e.target.value);render()};
+document.getElementById('fTier').onchange=e=>{const v=+e.target.value;e.target.checked?F.tier.add(v):F.tier.delete(v);render()};
+document.getElementById('clrType').onclick=()=>{F.type=new Set(TYPES);render()};document.getElementById('clrTier').onclick=()=>{F.tier=new Set([1,2,3]);render()};
+document.querySelector('#score thead').onclick=e=>{const k=e.target.dataset.k;if(!k)return;F.dir=F.sort===k?-F.dir:1;F.sort=k;render()};
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===t));document.querySelectorAll('.page').forEach((p,i)=>p.classList.toggle('on',i===+t.dataset.p))});
+render();flow();
 })();
 </script>
 </body>
