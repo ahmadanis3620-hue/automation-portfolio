@@ -223,7 +223,7 @@ function renderSlack(){
   <div style="margin-top:6px"><b>🟠 Due in the next 4 days</b><ul>${soon.map(li).join('')}</ul></div>
   <div style="margin-top:6px"><b>📦 Inventory</b><ul>${low.map(i=>`<li>${i.sku} below reorder point (${onHand(i)} on hand vs ${i.min})</li>`).join('')}</ul></div>
   <div style="margin-top:6px"><b>🚚 Shipments</b><ul>${late.map(s=>`<li>${s.id} running ${s.delay} day${s.delay>1?'s':''} late, new ETA ${nice(s.eta)}</li>`).join('')}</ul></div></div></div>`;
-  document.getElementById('dms').innerHTML=TEAM.map(p=>{const mine=open.filter(t=>t.o===p&&t.vis==='personal');if(!mine.length)return'';return `<div class="msg"><div class="av" style="background:var(--s3)">AI</div><div><div class="who">Ops Bot → ${p}<span>DM</span></div><div>Hey ${p}, your personal tasks this week:</div><ul>${mine.map(t=>`<li>${esc(t.t)} · due ${nice(t.due)}${t.s==='Blocked'?' · <b>blocked</b>, reply here and I'll loop in Maya':''}</li>`).join('')}</ul></div></div>`}).join('');
+  document.getElementById('dms').innerHTML=TEAM.map(p=>{const mine=open.filter(t=>t.o===p&&t.vis==='personal');if(!mine.length)return'';return `<div class="msg"><div class="av" style="background:var(--s3)">AI</div><div><div class="who">Ops Bot → ${p}<span>DM</span></div><div>Hey ${p}, your personal tasks this week:</div><ul>${mine.map(t=>`<li>${esc(t.t)} · due ${nice(t.due)}${t.s==='Blocked'?' · <b>blocked</b>, reply here and I will loop in Maya':''}</li>`).join('')}</ul></div></div>`}).join('');
 }
 function renderInv(){
   const total=INV.reduce((a,i)=>a+value(i),0),low=INV.filter(i=>onHand(i)<i.min).length,units=INV.reduce((a,i)=>a+onHand(i),0);
