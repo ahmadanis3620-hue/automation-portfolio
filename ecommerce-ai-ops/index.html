@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-commerce AI Ops Hub</title>
+<meta name="description" content="Demo: Notion source of truth, Slack task digests, live inventory with costing, multi-channel forecasting and inbound shipment tracking for a small e-commerce team.">
+<style>
+:root{color-scheme:light;--bg:#f4f4f2;--surface:#fcfcfb;--surface-2:#f0efec;--border:#e2e1dc;--text:#0b0b0b;--text-2:#52514e;--muted:#7a7974;--grid:#e8e7e2;--accent:#2a78d6;--accent-soft:#cde2fb;--s1:#2a78d6;--s2:#eb6834;--s3:#1baf7a;--good:#0ca30c;--warning:#fab219;--serious:#ec835a;--critical:#d03b3b;--slack:#4a154b;--shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111110;--surface:#1a1a19;--surface-2:#232321;--border:#33332f;--text:#f0efec;--text-2:#c3c2b7;--muted:#8f8e86;--grid:#2c2c29;--accent:#3987e5;--accent-soft:#1c3a63;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--shadow:none}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111110;--surface:#1a1a19;--surface-2:#232321;--border:#33332f;--text:#f0efec;--text-2:#c3c2b7;--muted:#8f8e86;--grid:#2c2c29;--accent:#3987e5;--accent-soft:#1c3a63;--s1:#3987e5;--s2:#d95926;--s3:#199e70;--shadow:none}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1200px;margin:0 auto;padding:24px 16px 56px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:16px}
+h1{font-size:22px;margin:0 0 4px}.sub{color:var(--text-2);margin:0;max-width:720px}
+.badge{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:99px;margin-bottom:8px}
+.btn{font:inherit;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--text);padding:7px 12px;border-radius:8px;cursor:pointer}
+.btn:hover{border-color:var(--accent)}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn:focus-visible,.tab:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--text-2);box-shadow:var(--shadow)}
+.flow b{color:var(--text)}.flow .arr{color:var(--muted)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--border)}
+.tab{font:inherit;font-weight:600;background:none;border:0;border-bottom:2px solid transparent;color:var(--text-2);padding:8px 12px;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--text);border-bottom-color:var(--accent)}
+.panel{display:none}.panel.on{display:block}
+.grid{display:grid;gap:12px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.card h2{font-size:14px;margin:0 0 2px}.hint{font-size:12px;color:var(--muted);margin:0 0 10px}
+.kpi .l{font-size:12px;color:var(--text-2)}.kpi .v{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}.kpi .n{font-size:12px;color:var(--muted)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:8px 10px;text-align:left;border-top:1px solid var(--border);white-space:nowrap;font-size:13px}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600;border-top:0}
+td.num,th.num{text-align:right}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.pill{font-size:11px;padding:2px 7px;border-radius:99px;background:var(--surface-2);color:var(--text-2);font-weight:600}
+.sop{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid var(--border);font-size:13px}.sop:first-of-type{border-top:0}
+.slack{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
+.slack .top{background:var(--slack);color:#fff;padding:8px 14px;font-weight:700;font-size:13px}
+.msg{display:flex;gap:10px;padding:12px 14px;border-top:1px solid var(--border)}.msg:first-of-type{border-top:0}
+.av{width:34px;height:34px;border-radius:8px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;flex:none}
+.msg .who{font-weight:700;font-size:13px}.msg .who span{font-weight:400;color:var(--muted);font-size:12px;margin-left:6px}
+.msg ul{margin:6px 0 0;padding-left:18px}.msg li{margin:2px 0}
+.mention{background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 3px;font-weight:600}
+.ctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:end;margin-bottom:10px}
+.ctrl label{display:flex;flex-direction:column;gap:3px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+select,input{font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:6px 8px}
+input[type=number]{width:80px}
+.log{max-height:220px;overflow:auto;font-size:12px}
+.log div{padding:6px 0;border-top:1px solid var(--border)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-2);margin:4px 0 6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:16px;height:2px;background:currentColor;display:inline-block}.swd{width:16px;border-top:2px dashed currentColor;display:inline-block}
+svg text{fill:var(--muted);font-size:11px;font-family:inherit}
+.chart{position:relative}.tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:12px;box-shadow:0 4px 16px rgba(0,0,0,.12);display:none;white-space:nowrap;z-index:3}
+.track{height:8px;background:var(--surface-2);border-radius:4px;overflow:hidden;margin:6px 0}
+.track i{display:block;height:100%;background:var(--accent);border-radius:0 4px 4px 0}
+.steps{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}.steps .done{color:var(--text);font-weight:600}
+.ship{padding:10px 0;border-top:1px solid var(--border)}.ship:first-of-type{border-top:0}
+.ship .h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:13px}
+.ask{display:flex;gap:8px;flex-wrap:wrap}.ask input{flex:1 1 260px}
+.answer{margin-top:10px;padding:12px;border-radius:10px;background:var(--surface-2);font-size:13px;white-space:pre-line;min-height:48px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.chips button{font:inherit;font-size:12px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);border-radius:99px;padding:4px 10px;cursor:pointer}
+footer{margin-top:22px;font-size:12px;color:var(--muted);text-align:center}footer a{color:var(--accent)}
+@media (max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.g2,.g3,.g4{grid-template-columns:1fr}.kpi .v{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <span class="badge">Portfolio demo · mock data</span>
+    <h1>E-commerce AI Ops Hub</h1>
+    <p class="sub">One source of truth for a small e-commerce team: SOPs and tasks in Notion, weekly Slack digests and personal pings, live inventory with costing, a multi-channel sales forecast, and inbound truck tracking, all readable by Claude, ChatGPT or Grok. Brand and numbers are fictional.</p>
+  </div>
+  <button class="btn" id="themeBtn" type="button">◐ Theme</button>
+</header>
+
+<div class="flow" aria-label="How the system connects">
+  <b>Notion</b> (SOPs, tasks, call notes) <span class="arr">→</span> <b>Automation layer</b> (Python + n8n) <span class="arr">→</span> <b>Slack</b> digests & pings · <b>Inventory</b> · <b>Forecast</b> · <b>Shipments</b> <span class="arr">→</span> <b>AI assistant</b> answers from the same data
+</div>
+
+<div class="tabs" role="tablist">
+  <button class="tab" role="tab" aria-selected="true" data-p="truth">Source of truth</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="slack">Slack digest</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="inv">Inventory</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="fc">Forecast</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="ship">Shipments</button>
+  <button class="tab" role="tab" aria-selected="false" data-p="ai">Ask the AI</button>
+</div>
+
+<!-- SOURCE OF TRUTH -->
+<section class="panel on" id="p-truth">
+  <div class="grid g4" style="margin-bottom:12px" id="taskKpis"></div>
+  <div class="grid g2">
+    <div class="card"><h2>Team tasks (Notion database)</h2><p class="hint">Owner, project, due date, priority and visibility: team tasks go to #ops, personal ones are DM'd.</p>
+      <div class="ctrl"><label>Owner<select id="fOwner"><option value="">Everyone</option></select></label><label>Status<select id="fStatus"><option value="">Any</option><option>To do</option><option>In progress</option><option>Blocked</option><option>Done</option></select></label></div>
+      <div class="scroll"><table id="taskTbl"><thead><tr><th>Task</th><th>Owner</th><th>Project</th><th>Due</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card"><h2>SOP library & call notes</h2><p class="hint">Every SOP and recorded call is indexed so AI tools answer from the company's own playbook.</p><div id="sops"></div></div>
+  </div>
+</section>
+
+<!-- SLACK -->
+<section class="panel" id="p-slack">
+  <div class="grid g2">
+    <div class="slack"><div class="top"># ops-weekly · Friday 4:00 PM</div><div id="digest"></div></div>
+    <div class="slack"><div class="top">Direct messages (personal tasks, only they see these)</div><div id="dms"></div></div>
+  </div>
+  <p class="hint" style="margin-top:10px">Generated automatically from the Notion task database: overdue and urgent items go to the channel; personal tasks are sent as DMs.</p>
+</section>
+
+<!-- INVENTORY -->
+<section class="panel" id="p-inv">
+  <div class="grid g4" style="margin-bottom:12px" id="invKpis"></div>
+  <div class="grid g2">
+    <div class="card"><h2>Live inventory & landed cost</h2><p class="hint">FIFO cost layers update on every check-in/check-out.</p>
+      <div class="scroll"><table id="invTbl"><thead><tr><th>SKU</th><th class="num">On hand</th><th class="num">Avg landed cost</th><th class="num">Value</th><th>Status</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    <div class="card"><h2>Check in / check out</h2><p class="hint">Try it: post a movement and watch stock, cost and value update.</p>
+      <div class="ctrl"><label>SKU<select id="mvSku"></select></label><label>Type<select id="mvType"><option value="in">Check in</option><option value="out">Check out</option></select></label><label>Qty<input type="number" id="mvQty" value="24" min="1"></label><label>Unit cost<input type="number" id="mvCost" value="6.40" step="0.01"></label><button class="btn primary" id="mvBtn" type="button">Post</button></div>
+      <div class="log" id="mvLog" aria-live="polite"></div>
+    </div>
+  </div>
+</section>
+
+<!-- FORECAST -->
+<section class="panel" id="p-fc">
+  <div class="grid g3" style="margin-bottom:12px" id="fcKpis"></div>
+  <div class="card chart"><h2>Weekly units by channel: last 12 weeks + 6-week forecast</h2>
+    <div class="legend" id="fcLegend"></div><div id="fcChart"></div><div class="tip" id="fcTip"></div></div>
+  <p class="hint" style="margin-top:10px">Forecast = recent run-rate × trend, with seasonality from last year. In production it reads Amazon Seller Central, TikTok Shop and Shopify sales directly.</p>
+</section>
+
+<!-- SHIPMENTS -->
+<section class="panel" id="p-ship">
+  <div class="card"><h2>Inbound loads</h2><p class="hint">Booked in Amazon Seller Central or TikTok Shop logistics; carrier tracking updates the ETA and pings Slack on delays.</p><div id="ships"></div></div>
+</section>
+
+<!-- AI -->
+<section class="panel" id="p-ai">
+  <div class="card"><h2>Ask the ops assistant</h2><p class="hint">In production this is Claude/ChatGPT reading the same Notion + inventory + shipment data. In this demo, answers are computed from the mock data.</p>
+    <div class="ask"><input id="q" placeholder="e.g. What's urgent this week?" aria-label="Question"><button class="btn primary" id="askBtn" type="button">Ask</button></div>
+    <div class="chips" id="sugg"></div>
+    <div class="answer" id="ans" aria-live="polite">Pick a suggested question or type your own.</div>
+  </div>
+</section>
+
+<footer>Built by Ahmad Anis · Python & AI automation for e-commerce operations · <a href="https://ahmadanis3620-hue.github.io/automation-portfolio/">More work</a></footer>
+</div>
+
+<script>
+(()=>{
+const TODAY=new Date('2026-11-17T09:00:00');
+const fmt$=n=>'$'+n.toLocaleString(undefined,{maximumFractionDigits:0});
+const fmt$2=n=>'$'+n.toFixed(2);
+const dd=s=>{const d=new Date(s+'T00:00:00');return Math.round((d-TODAY)/864e5)};
+const nice=s=>new Date(s+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric'});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const TEAM=['Maya','Jordan','Priya','Leo'];
+const TASKS=[
+ {t:'Upload Q4 TikTok Shop listings (12 SKUs)',o:'Maya',p:'TikTok Shop launch',due:'2026-11-14',s:'In progress',pr:'High',vis:'team'},
+ {t:'Book FTL inbound for Lavender Candle restock',o:'Jordan',p:'Inventory',due:'2026-11-18',s:'To do',pr:'Urgent',vis:'team'},
+ {t:'Reconcile October Amazon reimbursements',o:'Priya',p:'Finance',due:'2026-11-15',s:'Blocked',pr:'High',vis:'personal'},
+ {t:'Record SOP: returns check-in process',o:'Leo',p:'SOPs',due:'2026-11-21',s:'To do',pr:'Normal',vis:'team'},
+ {t:'Approve Black Friday bundle pricing',o:'Maya',p:'Promotions',due:'2026-11-19',s:'To do',pr:'Urgent',vis:'personal'},
+ {t:'Cycle count: aisle B (candles)',o:'Leo',p:'Inventory',due:'2026-11-17',s:'In progress',pr:'High',vis:'team'},
+ {t:'Draft supplier PO: glass jars (MOQ 2,000)',o:'Jordan',p:'Purchasing',due:'2026-11-20',s:'To do',pr:'High',vis:'personal'},
+ {t:'Set up Shopify → Notion order sync',o:'Priya',p:'Automation',due:'2026-11-12',s:'Done',pr:'Normal',vis:'team'},
+ {t:'Review weekly creator content (6 videos)',o:'Maya',p:'Marketing',due:'2026-11-22',s:'To do',pr:'Normal',vis:'team'},
+ {t:'Fix FBA inventory mismatch on WICK-02',o:'Jordan',p:'Inventory',due:'2026-11-13',s:'In progress',pr:'Urgent',vis:'team'},
+];
+const SOPS=[['Receiving & check-in of inbound pallets','SOP · updated Nov 3'],['Returns inspection and restock','SOP · updated Oct 28'],['Booking Amazon SPD/LTL shipments','SOP · updated Oct 21'],['TikTok Shop order exceptions','SOP · updated Nov 10'],['Weekly ops call: Nov 14 (transcript + action items)','Call recording · 42 min'],['Supplier onboarding checklist','SOP · updated Sep 30']];
+
+let INV=[
+ {sku:'CAND-LAV',n:'Lavender Candle 8oz',layers:[[120,5.90],[96,6.40]],min:150},
+ {sku:'CAND-CED',n:'Cedar Candle 8oz',layers:[[310,6.10]],min:150},
+ {sku:'WICK-02',n:'Wood Wick Refill 2pk',layers:[[45,1.20]],min:120},
+ {sku:'DIFF-REED',n:'Reed Diffuser 100ml',layers:[[180,7.80],[60,8.10]],min:100},
+ {sku:'GIFT-SET',n:'Holiday Gift Set',layers:[[72,18.50]],min:90},
+];
+const onHand=i=>i.layers.reduce((a,l)=>a+l[0],0);
+const value=i=>i.layers.reduce((a,l)=>a+l[0]*l[1],0);
+const avgCost=i=>onHand(i)?value(i)/onHand(i):0;
+
+const CH=[{k:'Amazon',c:'var(--s1)'},{k:'TikTok Shop',c:'var(--s2)'},{k:'Shopify',c:'var(--s3)'}];
+const WEEKS=12,FWD=6;
+const hist={Amazon:[410,395,430,452,440,468,490,505,498,530,552,575],'TikTok Shop':[60,72,85,110,128,150,171,205,226,260,298,330],Shopify:[180,176,190,185,198,204,210,215,222,240,265,290]};
+const season=[1.04,1.12,1.25,1.18,0.92,0.95];
+const fc={};CH.forEach(({k})=>{const h=hist[k];const last=h.slice(-4);const rate=last.reduce((a,b)=>a+b)/4;const tr=(h[11]-h[7])/4/rate;fc[k]=season.map((s,i)=>Math.round(rate*(1+tr*(i+2))*s))});
+
+const SHIPS=[
+ {id:'AMZ-SPD-4471',via:'Amazon SPD · UPS',from:'Supplier (Dallas, TX)',to:'FBA CMH2',skus:'CAND-CED ×300',stage:3,eta:'2026-11-18',delay:0},
+ {id:'AMZ-LTL-8810',via:'Amazon LTL · XPO',from:'3PL (Columbus, OH)',to:'FBA IND9',skus:'GIFT-SET ×240',stage:2,eta:'2026-11-21',delay:1},
+ {id:'TTS-1932',via:'TikTok Shop logistics',from:'Warehouse',to:'TikTok FBT',skus:'CAND-LAV ×180',stage:1,eta:'2026-11-24',delay:0},
+ {id:'PO-3307',via:'FTL · Freightquote',from:'Glass supplier (Monterrey, MX)',to:'Warehouse',skus:'Jars ×2,000',stage:2,eta:'2026-11-26',delay:2},
+];
+const STAGES=['Booked','Picked up','In transit','Out for delivery','Delivered'];
+
+const statusDot={"To do":'var(--muted)',"In progress":'var(--accent)',"Blocked":'var(--critical)',"Done":'var(--good)'};
+
+function renderTasks(){
+  const o=document.getElementById('fOwner').value,s=document.getElementById('fStatus').value;
+  const open=TASKS.filter(t=>t.s!=='Done');
+  const overdue=open.filter(t=>dd(t.due)<0),urgent=open.filter(t=>t.pr==='Urgent'),blocked=open.filter(t=>t.s==='Blocked');
+  document.getElementById('taskKpis').innerHTML=[['Open tasks',open.length,'across '+TEAM.length+' people'],['Overdue',overdue.length,'flagged in Friday digest'],['Urgent',urgent.length,'pinged same day'],['Blocked',blocked.length,'needs a decision']].map(k=>`<div class="card kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join('');
+  document.querySelector('#taskTbl tbody').innerHTML=TASKS.filter(t=>(!o||t.o===o)&&(!s||t.s===s)).sort((a,b)=>a.due.localeCompare(b.due)).map(t=>{const d=dd(t.due);const late=t.s!=='Done'&&d<0;return `<tr><td>${esc(t.t)} ${t.vis==='personal'?'<span class="pill">personal</span>':''} ${t.pr==='Urgent'?'<span class="pill" style="color:var(--critical)">urgent</span>':''}</td><td>${t.o}</td><td>${esc(t.p)}</td><td style="${late?'color:var(--critical);font-weight:600':''}">${nice(t.due)}${late?' · '+(-d)+'d late':''}</td><td><span class="chip"><span class="dot" style="background:${statusDot[t.s]}"></span>${t.s}</span></td></tr>`}).join('');
+  document.getElementById('sops').innerHTML=SOPS.map(s=>`<div class="sop"><span>📄 ${esc(s[0])}</span><span class="pill">${esc(s[1])}</span></div>`).join('');
+}
+function renderSlack(){
+  const open=TASKS.filter(t=>t.s!=='Done');
+  const team=open.filter(t=>t.vis==='team');
+  const overdue=team.filter(t=>dd(t.due)<0),soon=team.filter(t=>dd(t.due)>=0&&dd(t.due)<=4);
+  const low=INV.filter(i=>onHand(i)<i.min);const late=SHIPS.filter(s=>s.delay>0);
+  const li=t=>`<li>${esc(t.t)}: <span class="mention">@${t.o}</span> · due ${nice(t.due)}</li>`;
+  document.getElementById('digest').innerHTML=`<div class="msg"><div class="av">AI</div><div><div class="who">Ops Bot<span>APP · 4:00 PM</span></div>
+  <div>📋 <b>Weekly ops digest</b>: ${open.length} open tasks, ${overdue.length} overdue.</div>
+  <div style="margin-top:6px"><b>🔴 Overdue</b><ul>${overdue.map(li).join('')||'<li>None 🎉</li>'}</ul></div>
+  <div style="margin-top:6px"><b>🟠 Due in the next 4 days</b><ul>${soon.map(li).join('')}</ul></div>
+  <div style="margin-top:6px"><b>📦 Inventory</b><ul>${low.map(i=>`<li>${i.sku} below reorder point (${onHand(i)} on hand vs ${i.min})</li>`).join('')}</ul></div>
+  <div style="margin-top:6px"><b>🚚 Shipments</b><ul>${late.map(s=>`<li>${s.id} running ${s.delay} day${s.delay>1?'s':''} late, new ETA ${nice(s.eta)}</li>`).join('')}</ul></div></div></div>`;
+  document.getElementById('dms').innerHTML=TEAM.map(p=>{const mine=open.filter(t=>t.o===p&&t.vis==='personal');if(!mine.length)return'';return `<div class="msg"><div class="av" style="background:var(--s3)">AI</div><div><div class="who">Ops Bot → ${p}<span>DM</span></div><div>Hey ${p}, your personal tasks this week:</div><ul>${mine.map(t=>`<li>${esc(t.t)} · due ${nice(t.due)}${t.s==='Blocked'?' · <b>blocked</b>, reply here and I'll loop in Maya':''}</li>`).join('')}</ul></div></div>`}).join('');
+}
+function renderInv(){
+  const total=INV.reduce((a,i)=>a+value(i),0),low=INV.filter(i=>onHand(i)<i.min).length,units=INV.reduce((a,i)=>a+onHand(i),0);
+  document.getElementById('invKpis').innerHTML=[['Inventory value',fmt$(total),'at FIFO landed cost'],['Units on hand',units.toLocaleString(),INV.length+' SKUs'],['Below reorder point',low,'auto-alert in Slack'],['Movements today',document.querySelectorAll('#mvLog div').length,'check-ins & check-outs']].map(k=>`<div class="card kpi"><div class="l">${k[0]}</div><div class="v">${k[1]}</div><div class="n">${k[2]}</div></div>`).join('');
+  document.querySelector('#invTbl tbody').innerHTML=INV.map(i=>{const lowS=onHand(i)<i.min;return `<tr><td><b>${i.sku}</b><div class="hint" style="margin:0">${esc(i.n)}</div></td><td class="num">${onHand(i)}</td><td class="num">${fmt$2(avgCost(i))}</td><td class="num">${fmt$(value(i))}</td><td><span class="chip"><span class="dot" style="background:${lowS?'var(--serious)':'var(--good)'}"></span>${lowS?'Reorder':'OK'}</span></td></tr>`}).join('');
+  const sel=document.getElementById('mvSku');if(!sel.options.length)sel.innerHTML=INV.map(i=>`<option>${i.sku}</option>`).join('');
+}
+function post(){
+  const i=INV.find(x=>x.sku===document.getElementById('mvSku').value);const type=document.getElementById('mvType').value;
+  const q=Math.max(1,parseInt(document.getElementById('mvQty').value)||0);const c=parseFloat(document.getElementById('mvCost').value)||0;
+  let note;
+  if(type==='in'){i.layers.push([q,c]);note=`✅ Checked in ${q} × ${i.sku} at ${fmt$2(c)}; avg cost now ${fmt$2(avgCost(i))}`}
+  else{if(q>onHand(i)){note=`⚠️ Can't check out ${q} × ${i.sku}: only ${onHand(i)} on hand`}else{let r=q,cogs=0;while(r>0){const l=i.layers[0];const take=Math.min(r,l[0]);cogs+=take*l[1];l[0]-=take;r-=take;if(!l[0])i.layers.shift()}note=`📤 Checked out ${q} × ${i.sku}; COGS ${fmt$2(cogs)} (FIFO)${onHand(i)<i.min?' · below reorder point, Slack alert sent':''}`}}
+  const d=document.createElement('div');d.textContent=new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})+'  '+note;document.getElementById('mvLog').prepend(d);
+  renderInv();renderSlack();
+}
+function renderFc(){
+  const tot=k=>fc[k].reduce((a,b)=>a+b);
+  document.getElementById('fcKpis').innerHTML=CH.map(({k,c})=>{const last6=hist[k].slice(-6).reduce((a,b)=>a+b);const g=Math.round((tot(k)/last6-1)*100);return `<div class="card kpi"><div class="l"><span class="dot" style="background:${c}"></span> ${k}: next 6 weeks</div><div class="v">${tot(k).toLocaleString()} units</div><div class="n">${g>=0?'+':''}${g}% vs last 6 weeks</div></div>`}).join('');
+  document.getElementById('fcLegend').innerHTML=CH.map(({k,c})=>`<span style="color:${c}"><i class="sw"></i><b style="color:var(--text-2);font-weight:400">${k}</b></span>`).join('')+`<span><i class="swd"></i>Forecast</span>`;
+  const el=document.getElementById('fcChart');const W=el.clientWidth||900,H=260,m={t:12,r:16,b:26,l:44};const iw=W-m.l-m.r,ih=H-m.t-m.b;const N=WEEKS+FWD;
+  const max=Math.max(...CH.flatMap(({k})=>hist[k].concat(fc[k])))*1.1;
+  const x=i=>m.l+i/(N-1)*iw,y=v=>m.t+ih-v/max*ih;
+  let g='';for(let k=0;k<=4;k++){const v=max/4*k;g+=`<line x1="${m.l}" x2="${W-m.r}" y1="${y(v)}" y2="${y(v)}" stroke="var(--grid)"/><text x="${m.l-6}" y="${y(v)+4}" text-anchor="end">${Math.round(v)}</text>`}
+  g+=`<line x1="${x(WEEKS-1)}" x2="${x(WEEKS-1)}" y1="${m.t}" y2="${m.t+ih}" stroke="var(--muted)" stroke-dasharray="3 3"/><text x="${x(WEEKS-1)+4}" y="${m.t+10}">Today</text>`;
+  [0,6,11,17].forEach(i=>g+=`<text x="${x(i)}" y="${H-6}" text-anchor="middle">${i<WEEKS?'W'+(i-11):'+'+(i-11)+'w'}</text>`);
+  CH.forEach(({k,c})=>{const h=hist[k],f=[h[11]].concat(fc[k]);g+=`<path d="${h.map((v,i)=>(i?'L':'M')+x(i)+','+y(v)).join('')}" fill="none" stroke="${c}" stroke-width="2"/><path d="${f.map((v,i)=>(i?'L':'M')+x(WEEKS-1+i)+','+y(v)).join('')}" fill="none" stroke="${c}" stroke-width="2" stroke-dasharray="5 4"/>`});
+  el.innerHTML=`<svg width="${W}" height="${H}" role="img" aria-label="Weekly units by channel with forecast">${g}<line class="xh" y1="${m.t}" y2="${m.t+ih}" stroke="var(--muted)" visibility="hidden"/><rect x="${m.l}" y="${m.t}" width="${iw}" height="${ih}" fill="transparent"/></svg>`;
+  const svg=el.querySelector('svg'),tip=document.getElementById('fcTip'),xh=svg.querySelector('.xh');
+  svg.onmousemove=e=>{const b=svg.getBoundingClientRect();const i=Math.max(0,Math.min(N-1,Math.round((e.clientX-b.left-m.l)/iw*(N-1))));xh.setAttribute('x1',x(i));xh.setAttribute('x2',x(i));xh.setAttribute('visibility','visible');const lab=i<WEEKS?`Week ${i-11}`:`Forecast +${i-11}w`;tip.innerHTML=`<b>${lab}</b><br>`+CH.map(({k,c})=>`<span class="dot" style="background:${c}"></span> ${k}: <b>${(i<WEEKS?hist[k][i]:fc[k][i-WEEKS]).toLocaleString()}</b>`).join('<br>');tip.style.display='block';const L=x(i)+14;tip.style.left=(L+tip.offsetWidth>W?x(i)-tip.offsetWidth-14:L)+'px';tip.style.top='60px'};
+  svg.onmouseleave=()=>{tip.style.display='none';xh.setAttribute('visibility','hidden')};
+}
+function renderShips(){
+  document.getElementById('ships').innerHTML=SHIPS.map(s=>`<div class="ship"><div class="h"><span><b>${s.id}</b> · ${esc(s.via)} · ${esc(s.skus)}</span><span>${esc(s.from)} → ${esc(s.to)} · ETA <b>${nice(s.eta)}</b> ${s.delay?`<span class="pill" style="color:var(--critical)">+${s.delay}d delay</span>`:'<span class="pill" style="color:var(--good)">on time</span>'}</span></div><div class="track"><i style="width:${(s.stage+.5)/STAGES.length*100}%;${s.delay?'background:var(--serious)':''}"></i></div><div class="steps">${STAGES.map((t,i)=>`<span class="${i<=s.stage?'done':''}">${t}</span>`).join('')}</div></div>`).join('');
+}
+const QA=[
+ [/urgent|this week|priorit/i,()=>{const u=TASKS.filter(t=>t.s!=='Done'&&(t.pr==='Urgent'||dd(t.due)<0)).sort((a,b)=>a.due.localeCompare(b.due));return 'Urgent or overdue right now:\n'+u.map(t=>`• ${t.t} (${t.o}, due ${nice(t.due)}${dd(t.due)<0?', '+(-dd(t.due))+'d late':''})`).join('\n')}],
+ [/reorder|stock|inventory|low/i,()=>{const l=INV.filter(i=>onHand(i)<i.min);return l.length?'Below reorder point:\n'+l.map(i=>`• ${i.sku}: ${onHand(i)} on hand vs ${i.min} target; suggest ordering ${Math.ceil((i.min*2-onHand(i))/24)*24} units`).join('\n'):'Everything is above its reorder point.'}],
+ [/truck|ship|where|eta|deliver/i,()=>SHIPS.map(s=>`• ${s.id}: ${STAGES[s.stage].toLowerCase()}, ETA ${nice(s.eta)}${s.delay?` (running ${s.delay}d late)`:''}`).join('\n')],
+ [/forecast|black friday|sales|tiktok|amazon|shopify/i,()=>CH.map(({k})=>`• ${k}: ${fc[k].reduce((a,b)=>a+b).toLocaleString()} units forecast over 6 weeks, peak ${Math.max(...fc[k])} in Black Friday week`).join('\n')+'\nTikTok Shop is growing fastest; make sure CAND-LAV stock covers it.'],
+ [/maya|jordan|priya|leo/i,q=>{const p=TEAM.find(n=>new RegExp(n,'i').test(q));const m=TASKS.filter(t=>t.o===p&&t.s!=='Done');return `${p} has ${m.length} open tasks:\n`+m.map(t=>`• ${t.t} (${t.s}, due ${nice(t.due)})`).join('\n')}],
+ [/sop|return|receiv|how do/i,()=>'From the SOP library: "Returns inspection and restock" (updated Oct 28) covers grading, photos, and restock vs. dispose. Leo is recording the updated returns check-in SOP, due Nov 21.'],
+];
+function ask(q){const hit=QA.find(([re])=>re.test(q));document.getElementById('ans').textContent=hit?hit[1](q):'In production I would search Notion, inventory and shipment data for that. Try: urgent tasks, low stock, where are my trucks, the forecast, or a teammate\'s name.'}
+['What\'s urgent this week?','Which SKUs need reordering?','Where are my trucks?','Black Friday forecast?','What is Jordan working on?'].forEach(s=>{const b=document.createElement('button');b.type='button';b.textContent=s;b.onclick=()=>{document.getElementById('q').value=s;ask(s)};document.getElementById('sugg').appendChild(b)});
+document.getElementById('askBtn').onclick=()=>ask(document.getElementById('q').value);
+document.getElementById('q').addEventListener('keydown',e=>{if(e.key==='Enter')ask(e.target.value)});
+
+document.getElementById('fOwner').innerHTML+=TEAM.map(t=>`<option>${t}</option>`).join('');
+['fOwner','fStatus'].forEach(id=>document.getElementById(id).onchange=renderTasks);
+document.getElementById('mvBtn').onclick=post;
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.setAttribute('aria-selected',x===t));document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+t.dataset.p));if(t.dataset.p==='fc')renderFc()});
+document.getElementById('themeBtn').onclick=()=>{const r=document.documentElement;const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=dark?'light':'dark';try{localStorage.setItem('theme',r.dataset.theme)}catch(e){}};
+try{const t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
+window.addEventListener('resize',()=>{if(document.getElementById('p-fc').classList.contains('on'))renderFc()});
+renderTasks();renderSlack();renderInv();renderShips();
+})();
+</script>
+</body>
+</html>
