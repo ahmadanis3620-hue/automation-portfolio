@@ -214,7 +214,7 @@ function gantt(R){
   let g='';for(let y=2025;y<=2027;y++)for(let q=0;q<12;q+=3){const d=`${y}-${String(q+1).padStart(2,'0')}-01`;const xx=x(d);if(xx<L||xx>W-20)continue;g+=`<line x1="${xx}" x2="${xx}" y1="0" y2="${H-24}" stroke="#EDEBE9"/><text x="${xx}" y="${H-8}" font-size="10" fill="#8A8886" text-anchor="middle">${['Jan','Apr','Jul','Oct'][q/3]} ${String(y).slice(2)}</text>`}
   const tx=x('2026-11-17');g+=`<line x1="${tx}" x2="${tx}" y1="0" y2="${H-24}" stroke="#252423" stroke-dasharray="4 3"/><text x="${tx+4}" y="10" font-size="10" fill="#252423">Today</text>`;
   items.forEach((it,k)=>{const y=k*rh+14;const st=stOf(it.e);const col=st==='Valid'?C.ok:st==='Expiring ≤60d'?C.warn:C.bad;g+=`<text x="${L-8}" y="${y+10}" font-size="11" text-anchor="end" fill="#252423">${it.s} · ${it.c}</text>`;
-    if(it.e){g+=`<rect class="gb" data-k="${k}" x="${x(it.i)}" y="${y}" width="${Math.max(2,x(it.e)-x(it.i))}" height="13" fill="${col}"/>`}else{g+=`<text x="${L+4}" y="${y+10}" font-size="11" fill="${C.bad}" font-weight="600">No certificate on file</text>`}});
+    if(it.e){g+=`<rect class="gb" data-k="${k}" x="${Math.max(L,x(it.i))}" y="${y}" width="${Math.max(2,x(it.e)-Math.max(L,x(it.i)))}" height="13" fill="${col}"/>`}else{g+=`<text x="${L+4}" y="${y+10}" font-size="11" fill="${C.bad}" font-weight="600">No certificate on file</text>`}});
   const el=document.getElementById('gantt');el.innerHTML=svgEl(W,H,g);
   el.querySelectorAll('.gb').forEach(b=>{const it=items[b.dataset.k];b.onmousemove=e=>showTip(e,`<b>${it.s}</b><br>${it.c}<br>Issued ${md(it.i)} · Expires ${md(it.e)}<br>${D(it.e)<0?`Expired ${-D(it.e)} days ago`:`${D(it.e)} days remaining`}`);b.onmouseleave=hideTip});
 }
