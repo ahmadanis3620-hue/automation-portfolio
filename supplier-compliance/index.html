@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supplier Compliance Dashboard</title>
+<meta name="description" content="Demo: supplier compliance, certification expiry, material traceability and supplier scorecards for apparel sourcing (mock data, Power BI-style layout).">
+<style>
+:root{color-scheme:light;--bg:#f3f2f1;--surface:#fff;--surface-2:#f0efec;--border:#e1dfdd;--text:#0b0b0b;--text-2:#52514e;--muted:#7a7974;--grid:#edebe9;--accent:#2a78d6;--accent-soft:#cde2fb;--good:#0ca30c;--warning:#fab219;--serious:#ec835a;--critical:#d03b3b;--bar:#2a78d6;--shadow:0 1px 2px rgba(0,0,0,.06)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111110;--surface:#1a1a19;--surface-2:#232321;--border:#33332f;--text:#f0efec;--text-2:#c3c2b7;--muted:#8f8e86;--grid:#2c2c29;--accent:#3987e5;--accent-soft:#1c3a63;--bar:#3987e5;--shadow:none}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111110;--surface:#1a1a19;--surface-2:#232321;--border:#33332f;--text:#f0efec;--text-2:#c3c2b7;--muted:#8f8e86;--grid:#2c2c29;--accent:#3987e5;--accent-soft:#1c3a63;--bar:#3987e5;--shadow:none}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px;margin-bottom:12px}
+h1{font-size:20px;margin:0 0 4px}.sub{color:var(--text-2);margin:0;max-width:760px}
+.badge{display:inline-block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);background:var(--accent-soft);padding:3px 8px;border-radius:99px;margin-bottom:6px}
+.btn{font:inherit;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--text);padding:6px 12px;border-radius:6px;cursor:pointer}
+.layout{display:grid;grid-template-columns:200px 1fr;gap:12px}
+.slicers{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px;box-shadow:var(--shadow);align-self:start}
+.slicers h3{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:0 0 6px}
+.slicers label{display:flex;gap:6px;align-items:center;margin:4px 0;font-size:13px;cursor:pointer}
+.slicers .grp{margin-bottom:14px}
+select{font:inherit;color:var(--text);background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:5px 8px;width:100%}
+.main{display:grid;gap:12px;min-width:0}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.tile,.card{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;box-shadow:var(--shadow);min-width:0}
+.tile .l{font-size:12px;color:var(--text-2)}.tile .v{font-size:24px;font-weight:700;font-variant-numeric:tabular-nums;margin-top:2px}.tile .n{font-size:11px;color:var(--muted)}
+.row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+.card h2{font-size:13px;margin:0 0 2px}.hint{font-size:11px;color:var(--muted);margin:0 0 8px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:6px 8px;text-align:left;border-top:1px solid var(--grid);white-space:nowrap}
+th{font-size:11px;color:var(--muted);font-weight:600;border-top:0;text-transform:uppercase;letter-spacing:.03em;cursor:pointer}
+td.num,th.num{text-align:right}
+tbody tr{cursor:pointer}tbody tr:hover,tbody tr.sel{background:var(--surface-2)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none}
+.meter{display:inline-block;width:70px;height:7px;background:var(--surface-2);border-radius:4px;overflow:hidden;vertical-align:middle;margin-right:6px}.meter i{display:block;height:100%;border-radius:0 4px 4px 0}
+.bars{display:flex;flex-direction:column;gap:8px}
+.bar{display:grid;grid-template-columns:120px 1fr 40px;gap:8px;align-items:center;font-size:12px}
+.bar .t{height:14px;background:var(--surface-2);border-radius:3px;overflow:hidden}.bar .t i{display:block;height:100%;border-radius:0 3px 3px 0}
+.bar .n{text-align:right;color:var(--text-2);font-variant-numeric:tabular-nums}
+.trace{display:flex;flex-wrap:wrap;align-items:stretch;gap:6px}
+.node{flex:1 1 140px;border:1px solid var(--border);border-radius:6px;padding:8px 10px;background:var(--surface-2)}
+.node .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}.node .v{font-weight:600}.node .s{font-size:11px;color:var(--text-2)}
+.arrow{align-self:center;color:var(--muted)}
+.model{font-size:12px;color:var(--text-2)}.model code{background:var(--surface-2);padding:1px 5px;border-radius:4px}
+footer{margin-top:18px;text-align:center;font-size:12px;color:var(--muted)}footer a{color:var(--accent)}
+@media (max-width:1000px){.tiles{grid-template-columns:repeat(3,1fr)}.row{grid-template-columns:1fr}}
+@media (max-width:760px){.layout{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><span class="badge">Portfolio demo · mock data · Power BI-style layout</span>
+  <h1>Supplier Compliance & Material Traceability</h1>
+  <p class="sub">For an apparel brand sourcing from mills, trim suppliers and cut-and-sew factories: certification coverage and expiry, missing documents, inspection results, supplier scorecards, and lot-level traceability from fiber to finished style. Click any supplier or lot to drill in.</p></div>
+  <button class="btn" id="themeBtn" type="button">◐ Theme</button>
+</header>
+
+<div class="layout">
+  <aside class="slicers" aria-label="Filters">
+    <div class="grp"><h3>Supplier type</h3><div id="fType"></div></div>
+    <div class="grp"><h3>Country</h3><select id="fCountry"><option value="">All countries</option></select></div>
+    <div class="grp"><h3>Certification</h3><select id="fCert"><option value="">All certifications</option></select></div>
+    <div class="grp"><h3>Risk</h3><div id="fRisk"></div></div>
+    <button class="btn" id="reset" type="button" style="width:100%">Clear filters</button>
+  </aside>
+
+  <div class="main">
+    <section class="tiles" id="tiles" aria-label="Key numbers"></section>
+
+    <div class="row">
+      <div class="card"><h2>Certification status</h2><p class="hint">Valid, expiring within 30/60/90 days, expired, or missing documents.</p><div class="bars" id="certBars"></div></div>
+      <div class="card"><h2>Compliance score by supplier type</h2><p class="hint">Average weighted score (0–100).</p><div class="bars" id="typeBars"></div></div>
+    </div>
+
+    <div class="card"><h2>Supplier scorecard</h2><p class="hint">Score = certifications 35% · documentation 25% · inspections 25% · on-time delivery 15%. Click a row for its certifications and lots.</p>
+      <div class="scroll"><table id="sc"><thead><tr><th data-k="name">Supplier</th><th data-k="type">Type</th><th data-k="country">Country</th><th class="num" data-k="score">Score</th><th class="num" data-k="docs">Docs complete</th><th class="num" data-k="insp">Inspection pass</th><th class="num" data-k="otd">On-time</th><th data-k="risk">Risk</th></tr></thead><tbody></tbody></table></div>
+    </div>
+
+    <div class="row">
+      <div class="card"><h2>Exceptions: action needed</h2><p class="hint">Expired or soon-expiring certifications, missing documents, failed inspections.</p><div class="scroll"><table id="ex"><thead><tr><th>Supplier</th><th>Issue</th><th>Due / since</th></tr></thead><tbody></tbody></table></div></div>
+      <div class="card"><h2 id="detTitle">Supplier detail</h2><p class="hint" id="detHint">Select a supplier in the scorecard.</p><div id="det"></div></div>
+    </div>
+
+    <div class="card"><h2>Material traceability</h2><p class="hint">Pick a finished-goods lot to trace it back through the documented chain.</p>
+      <select id="lotSel" style="max-width:360px;margin-bottom:10px"></select><div class="trace" id="trace"></div></div>
+
+    <div class="card model"><h2>How this is built in Power BI</h2>
+      <p>Star schema: <code>Dim_Supplier</code>, <code>Dim_Certification</code>, <code>Dim_Material</code>, <code>Dim_Date</code> with facts <code>Fact_CertRecord</code> (expiry, status), <code>Fact_Inspection</code>, <code>Fact_PO_Receipt</code> and <code>Fact_LotTrace</code>. Power Query cleans and merges the supplier Excel register, ERP purchase orders and the inspection log. DAX measures cover the weighted score, days-to-expiry buckets and documentation completeness. A scheduled refresh plus a data-driven subscription emails the exceptions list every Monday.</p>
+    </div>
+  </div>
+</div>
+<footer>Built by Ahmad Anis · supply chain analytics & BI · <a href="https://ahmadanis3620-hue.github.io/automation-portfolio/">More work</a></footer>
+</div>
+<script>
+(()=>{
+const TODAY=new Date('2026-11-17T00:00:00');
+const days=s=>Math.round((new Date(s+'T00:00:00')-TODAY)/864e5);
+const nice=s=>new Date(s+'T00:00:00').toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});
+const TYPES=['Fabric mill','Trim supplier','Cut & sew factory','Dye house'];
+const CERTS=['GOTS','OEKO-TEX 100','BSCI','GRS','WRAP'];
+// mock suppliers
+const S=[
+ ['Anatolia Textiles','Fabric mill','Türkiye',96,98,95],['Coastline Knits','Fabric mill','Portugal',92,90,97],['Indus Cotton Mills','Fabric mill','Pakistan',81,85,88],['Saigon Weave Co.','Fabric mill','Vietnam',74,80,83],
+ ['Button & Bar Trims','Trim supplier','China',88,92,94],['Zipline Components','Trim supplier','India',63,70,76],['LabelWorks','Trim supplier','Bangladesh',90,95,91],
+ ['Dhaka Apparel Group','Cut & sew factory','Bangladesh',78,84,80],['Pacific Sewing Ltd.','Cut & sew factory','Vietnam',94,96,93],['Lima Garment Works','Cut & sew factory','Peru',86,88,92],['Northern Stitch','Cut & sew factory','Guatemala',58,66,71],
+ ['Colorfast Dyeing','Dye house','India',83,79,89],['Blue River Dye','Dye house','China',69,74,85],
+];
+const CERTREC={ // supplier -> [cert, expiry or null(missing doc)]
+ 'Anatolia Textiles':[['GOTS','2027-06-30'],['OEKO-TEX 100','2027-02-14']],'Coastline Knits':[['GRS','2026-12-05'],['OEKO-TEX 100','2027-08-01']],
+ 'Indus Cotton Mills':[['GOTS','2026-12-28'],['BSCI','2027-03-11']],'Saigon Weave Co.':[['OEKO-TEX 100','2026-11-02'],['BSCI',null]],
+ 'Button & Bar Trims':[['OEKO-TEX 100','2027-05-20']],'Zipline Components':[['OEKO-TEX 100','2026-10-15'],['BSCI',null]],'LabelWorks':[['OEKO-TEX 100','2027-01-09'],['GRS','2027-04-22']],
+ 'Dhaka Apparel Group':[['WRAP','2027-01-30'],['BSCI','2026-12-12']],'Pacific Sewing Ltd.':[['WRAP','2027-09-10'],['BSCI','2027-07-01']],'Lima Garment Works':[['WRAP','2027-02-02'],['GOTS','2027-03-15']],
+ 'Northern Stitch':[['WRAP','2026-09-30'],['BSCI',null]],'Colorfast Dyeing':[['OEKO-TEX 100','2026-12-20'],['GOTS','2027-05-05']],'Blue River Dye':[['OEKO-TEX 100','2027-01-25'],['BSCI','2026-11-29']],
+};
+const INSPFAIL={'Northern Stitch':'Final AQL 2.5 failed (stitching defects), Nov 3','Zipline Components':'Nickel test failed on YKK-alt zipper lot, Oct 29','Blue River Dye':'Wastewater audit finding open, Oct 18'};
+const certStatus=e=>e===null?'Missing document':days(e)<0?'Expired':days(e)<=30?'Expires ≤30d':days(e)<=60?'Expires 31–60d':days(e)<=90?'Expires 61–90d':'Valid';
+const STATUS_COLOR={'Valid':'var(--good)','Expires 61–90d':'var(--accent)','Expires 31–60d':'var(--warning)','Expires ≤30d':'var(--serious)','Expired':'var(--critical)','Missing document':'var(--critical)'};
+const rows=S.map(([name,type,country,docs,insp,otd])=>{const cr=CERTREC[name];const certScore=cr.filter(c=>c[1]&&days(c[1])>=0).length/cr.length*100;const score=Math.round(certScore*.35+docs*.25+insp*.25+otd*.15);const bad=cr.some(c=>c[1]===null||days(c[1])<0)||INSPFAIL[name];const watch=cr.some(c=>c[1]&&days(c[1])>=0&&days(c[1])<=60);const risk=bad||score<70?'High':watch||score<85?'Medium':'Low';return{name,type,country,docs,insp,otd,score,risk,certs:cr}});
+const RISKC={High:'var(--critical)',Medium:'var(--warning)',Low:'var(--good)'};
+const LOTS=[
+ {lot:'FG-24117 · Organic Crew Tee (Navy)',chain:[['Fiber','Organic cotton, Sindh','GOTS TC-88412'],['Spinning / fabric','Indus Cotton Mills','Lot IC-5531 · GOTS exp Dec 28, 2026'],['Dyeing','Colorfast Dyeing','Batch CD-0912 · OEKO-TEX exp Dec 20, 2026'],['Trims','LabelWorks','Care labels LW-221'],['Cut & sew','Dhaka Apparel Group','PO 45-1180 · WRAP valid'],['Finished goods','DC Columbus','Received Oct 30, 2026']]},
+ {lot:'FG-24131 · Recycled Fleece Hoodie',chain:[['Fiber','rPET flake, Izmir','GRS TC-77120'],['Spinning / fabric','Anatolia Textiles','Lot AT-3302 · GOTS/OEKO valid'],['Dyeing','Anatolia Textiles (in-house)','Batch AT-D118'],['Trims','Zipline Components','Zipper ZC-901 · ⚠ OEKO-TEX expired'],['Cut & sew','Pacific Sewing Ltd.','PO 45-1204 · WRAP valid'],['Finished goods','DC Columbus','In transit, ETA Nov 24']]},
+ {lot:'FG-24152 · Merino Base Layer',chain:[['Fiber','Merino wool, NZ','RWS TC-30155'],['Spinning / fabric','Coastline Knits','Lot CK-7710 · GRS exp Dec 5, 2026'],['Dyeing','Blue River Dye','Batch BR-4402 · ⚠ audit finding open'],['Trims','Button & Bar Trims','Thread BB-118'],['Cut & sew','Northern Stitch','PO 45-1219 · ⚠ final inspection failed'],['Finished goods','Hold at factory','Pending re-inspection']]},
+];
+const $=id=>document.getElementById(id);
+const state={types:new Set(TYPES),country:'',cert:'',risks:new Set(['High','Medium','Low']),sort:'score',dir:1,sel:null};
+$('fType').innerHTML=TYPES.map(t=>`<label><input type="checkbox" checked value="${t}">${t}</label>`).join('');
+$('fRisk').innerHTML=['High','Medium','Low'].map(r=>`<label><input type="checkbox" checked value="${r}"><span class="dot" style="background:${RISKC[r]}"></span>${r}</label>`).join('');
+$('fCountry').innerHTML+=[...new Set(S.map(s=>s[2]))].sort().map(c=>`<option>${c}</option>`).join('');
+$('fCert').innerHTML+=CERTS.map(c=>`<option>${c}</option>`).join('');
+$('lotSel').innerHTML=LOTS.map((l,i)=>`<option value="${i}">${l.lot}</option>`).join('');
+const filt=()=>rows.filter(r=>state.types.has(r.type)&&(!state.country||r.country===state.country)&&(!state.cert||r.certs.some(c=>c[0]===state.cert))&&state.risks.has(r.risk));
+function bars(el,data,max,color){el.innerHTML=data.map(([k,v,c])=>`<div class="bar"><span>${k}</span><div class="t"><i style="width:${max?v/max*100:0}%;background:${c||color}"></i></div><span class="n">${v}</span></div>`).join('')}
+function render(){
+  const R=filt();const allCerts=R.flatMap(r=>r.certs.map(c=>({s:r.name,c:c[0],e:c[1],st:certStatus(c[1])})).filter(x=>!state.cert||x.c===state.cert));
+  const avg=R.length?Math.round(R.reduce((a,r)=>a+r.score,0)/R.length):0;
+  const exp=allCerts.filter(c=>c.st==='Expired').length,soon=allCerts.filter(c=>/Expires ≤30|31–60/.test(c.st)).length,miss=allCerts.filter(c=>c.st==='Missing document').length;
+  $('tiles').innerHTML=[['Suppliers in view',R.length,'of '+rows.length+' active'],['Avg compliance score',avg,'weighted 0–100'],['Expired certifications',exp,'block new POs'],['Expiring in 60 days',soon,'renewal reminders sent'],['Missing documents',miss,'request from supplier']].map(t=>`<div class="tile"><div class="l">${t[0]}</div><div class="v">${t[1]}</div><div class="n">${t[2]}</div></div>`).join('');
+  const order=['Valid','Expires 61–90d','Expires 31–60d','Expires ≤30d','Expired','Missing document'];
+  const cnt=order.map(o=>[o,allCerts.filter(c=>c.st===o).length,STATUS_COLOR[o]]);bars($('certBars'),cnt,Math.max(1,...cnt.map(c=>c[1])));
+  const tb=TYPES.map(t=>{const x=R.filter(r=>r.type===t);return[t,x.length?Math.round(x.reduce((a,r)=>a+r.score,0)/x.length):0]});bars($('typeBars'),tb,100,'var(--bar)');
+  const sorted=[...R].sort((a,b)=>{const k=state.sort;return(typeof a[k]==='string'?a[k].localeCompare(b[k]):a[k]-b[k])*state.dir});
+  const m=v=>`<span class="meter"><i style="width:${v}%;background:${v>=85?'var(--good)':v>=70?'var(--warning)':'var(--critical)'}"></i></span>${v}%`;
+  document.querySelector('#sc tbody').innerHTML=sorted.map(r=>`<tr data-n="${r.name}" class="${state.sel===r.name?'sel':''}"><td><b>${r.name}</b></td><td>${r.type}</td><td>${r.country}</td><td class="num"><b>${r.score}</b></td><td class="num">${m(r.docs)}</td><td class="num">${m(r.insp)}</td><td class="num">${m(r.otd)}</td><td><span class="chip"><span class="dot" style="background:${RISKC[r.risk]}"></span>${r.risk}</span></td></tr>`).join('');
+  const ex=[];R.forEach(r=>{r.certs.forEach(c=>{const st=certStatus(c[1]);if(st==='Missing document')ex.push([r.name,`${c[0]} certificate not on file`,'Missing',0]);else if(st==='Expired')ex.push([r.name,`${c[0]} expired`,nice(c[1]),1]);else if(st==='Expires ≤30d')ex.push([r.name,`${c[0]} expires in ${days(c[1])} days`,nice(c[1]),2])});if(INSPFAIL[r.name])ex.push([r.name,INSPFAIL[r.name].split(',')[0],INSPFAIL[r.name].split(', ')[1]||'',0])});
+  ex.sort((a,b)=>a[3]-b[3]);$('#ex'.slice(1))?null:0;document.querySelector('#ex tbody').innerHTML=ex.map(e=>`<tr data-n="${e[0]}"><td><b>${e[0]}</b></td><td><span class="chip"><span class="dot" style="background:${e[3]<2?'var(--critical)':'var(--serious)'}"></span>${e[1]}</span></td><td>${e[2]}</td></tr>`).join('')||'<tr><td colspan="3">No exceptions for this filter 🎉</td></tr>';
+  detail();
+}
+function detail(){
+  const r=rows.find(x=>x.name===state.sel);if(!r){$('detTitle').textContent='Supplier detail';$('det').innerHTML='';$('detHint').textContent='Select a supplier in the scorecard or exceptions list.';return}
+  $('detTitle').textContent=r.name;$('detHint').textContent=`${r.type} · ${r.country} · score ${r.score} · ${r.risk} risk`;
+  const lots=LOTS.filter(l=>l.chain.some(c=>c[1].startsWith(r.name)));
+  $('det').innerHTML=`<table><thead><tr><th>Certification</th><th>Expiry</th><th>Status</th></tr></thead><tbody>${r.certs.map(c=>{const st=certStatus(c[1]);return `<tr><td>${c[0]}</td><td>${c[1]?nice(c[1]):'—'}</td><td><span class="chip"><span class="dot" style="background:${STATUS_COLOR[st]}"></span>${st}</span></td></tr>`}).join('')}</tbody></table>${INSPFAIL[r.name]?`<p style="margin:8px 0 0"><b>Open issue:</b> ${INSPFAIL[r.name]}</p>`:''}<p style="margin:8px 0 0"><b>Lots using this supplier:</b> ${lots.length?lots.map(l=>l.lot.split(' · ')[0]).join(', '):'none in view'}</p>`;
+}
+function trace(){const l=LOTS[$('lotSel').value];$('trace').innerHTML=l.chain.map((c,i)=>`${i?'<span class="arrow">→</span>':''}<div class="node" style="${/⚠/.test(c[2])?'border-color:var(--critical)':''}"><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="s">${c[2]}</div></div>`).join('')}
+$('fType').onchange=e=>{e.target.checked?state.types.add(e.target.value):state.types.delete(e.target.value);render()};
+$('fRisk').onchange=e=>{e.target.checked?state.risks.add(e.target.value):state.risks.delete(e.target.value);render()};
+$('fCountry').onchange=e=>{state.country=e.target.value;render()};$('fCert').onchange=e=>{state.cert=e.target.value;render()};
+$('reset').onclick=()=>{state.types=new Set(TYPES);state.risks=new Set(['High','Medium','Low']);state.country='';state.cert='';document.querySelectorAll('.slicers input').forEach(i=>i.checked=true);$('fCountry').value='';$('fCert').value='';render()};
+document.querySelector('#sc thead').onclick=e=>{const k=e.target.dataset.k;if(!k)return;state.dir=state.sort===k?-state.dir:(k==='score'?1:1);state.sort=k;render()};
+document.addEventListener('click',e=>{const tr=e.target.closest('#sc tbody tr, #ex tbody tr');if(tr&&tr.dataset.n){state.sel=tr.dataset.n;render()}});
+$('lotSel').onchange=trace;
+$('themeBtn').onclick=()=>{const r=document.documentElement;const d=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.dataset.theme=d?'light':'dark';try{localStorage.setItem('theme',r.dataset.theme)}catch(e){}};
+try{const t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
+state.sel='Northern Stitch';render();trace();
+})();
+</script>
+</body>
+</html>
